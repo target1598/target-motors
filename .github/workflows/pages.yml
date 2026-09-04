@@ -32,7 +32,9 @@ jobs:
       - name: Prepare Pages folder
         run: |
           set -e
-          if [ -d .output/public ]; then
+          echo "Build output:"
+          find dist .output -name '*.html' 2>/dev/null || true
+          if [ -d .output/public ] && [ -f .output/public/index.html ]; then
             OUT=.output/public
           elif [ -d dist/client ]; then
             OUT=dist/client
@@ -41,12 +43,22 @@ jobs:
           else
             echo "No build output found" && ls -la && exit 1
           fi
+          echo "Using $OUT"
           mkdir -p _site
           cp -R "$OUT"/. _site/
           touch _site/.nojekyll
-          if [ -f _site/index.html ] && [ ! -f _site/404.html ]; then
-            cp _site/index.html _site/404.html
+          if [ ! -f _site/index.html ]; then
+            if [ -f _site/_shell.html ]; then
+              cp _site/_shell.html _site/index.html
+            elif [ -f dist/client/_shell.html ]; then
+              cp dist/client/_shell.html _site/index.html
+            else
+              echo "No index.html or _shell.html to publish"
+              ls -la _site
+              exit 1
+            fi
           fi
+          cp _site/index.html _site/404.html
           ls -la _site | head
       - uses: actions/upload-pages-artifact@v3
         with:
