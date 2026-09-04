@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_PAGES: "1"
           VITE_AUTH_ENABLED: "false"
-        run: node scripts/with-app-env.mjs ./node_modules/.bin/vite build || true
+        run: node scripts/with-app-env.mjs ./node_modules/.bin/vite build
       - name: Prepare Pages folder
         run: |
           set -e
@@ -43,6 +43,7 @@ jobs:
           fi
           mkdir -p _site
           cp -R "$OUT"/. _site/
+          touch _site/.nojekyll
           if [ -f _site/index.html ] && [ ! -f _site/404.html ]; then
             cp _site/index.html _site/404.html
           fi
