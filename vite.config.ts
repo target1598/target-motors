@@ -169,15 +169,14 @@ export default defineConfig(({ command, isPreview }) => ({
     tailwindcss(),
     tanstackStart(process.env.GITHUB_PAGES === "1" ? { spa: { enabled: true } } : {}),
     ...(command === "build" || isPreview
-      ? [
-          nitro({
-            preset: process.env.GITHUB_PAGES === "1" ? "github-pages" : "vercel",
-            // Auto-registers server/middleware/* (the PWA install page +
-            // manifest + head-tag middleware). Nitro v3 defaults serverDir to
-            // false, so removing this silently unwires /?install=1 on deploys.
-            serverDir: "./server",
-          }),
-        ]
+      ? process.env.GITHUB_PAGES === "1"
+        ? []
+        : [
+            nitro({
+              preset: "vercel",
+              serverDir: "./server",
+            }),
+          ]
       : []),
     viteReact(),
   ],
