@@ -17,8 +17,10 @@ export function CarRail({ cars }: { cars: Car[] }) {
             <img
               src={carImage(car)}
               alt={car.name[lang]}
-              referrerPolicy="no-referrer"
               className="size-full object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+              onError={(e) => {
+                e.currentTarget.src = `${import.meta.env.BASE_URL}cars/fallback.svg`;
+              }}
             />
           </div>
           <p className="mt-3 font-wordmark text-lg tracking-[0.08em] text-chrome-fg">

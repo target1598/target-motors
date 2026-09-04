@@ -18,8 +18,10 @@ export function CarCard({ car }: { car: Car }) {
         <img
           src={carImage(car)}
           alt={car.name[lang]}
-          referrerPolicy="no-referrer"
           className="size-full object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+          onError={(e) => {
+            e.currentTarget.src = `${import.meta.env.BASE_URL}cars/fallback.svg`;
+          }}
         />
         <div className="absolute inset-x-0 top-0 flex justify-between p-3">
           <Badge className="border-transparent bg-ink/80 text-paper">{car.year}</Badge>

@@ -34,7 +34,6 @@ function Home() {
         <img
           src={toyotaHero ? carImage(toyotaHero) : "/cars/fallback.svg"}
           alt=""
-          referrerPolicy="no-referrer"
           className="absolute inset-0 size-full object-contain object-[center_58%] scale-[1.18] pt-6 sm:scale-125"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-chrome via-chrome/25 to-transparent" />
@@ -91,7 +90,6 @@ function Home() {
             <img
               src={carImage(toyotaHero)}
               alt=""
-              referrerPolicy="no-referrer"
               className="absolute inset-0 size-full object-contain opacity-80 transition-transform duration-500 group-hover:scale-105"
             />
           ) : null}
@@ -110,7 +108,6 @@ function Home() {
             <img
               src={carImage(hondaHero)}
               alt=""
-              referrerPolicy="no-referrer"
               className="absolute inset-0 size-full object-contain opacity-80 transition-transform duration-500 group-hover:scale-105"
             />
           ) : null}

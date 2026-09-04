@@ -1,4 +1,4 @@
-import { catalogSrc } from "@/lib/visualizer";
+import { catalogSrc, hondaSrc } from "@/lib/visualizer";
 
 export type Text = { he: string; en: string };
 export type Paint = { id: string; name: Text; hex: string };
@@ -59,6 +59,14 @@ const P = {
   wind: { id: "wind-chill", name: { he: "ווינד צ׳יל", en: "Wind Chill Pearl" }, hex: "#d8d6cf" },
   ocean: { id: "ocean-gem", name: { he: "אושן ג׳ם", en: "Ocean Gem" }, hex: "#1f4f6a" },
   sand: { id: "sand-dune", name: { he: "סנד דיון", en: "Sand Dune" }, hex: "#c4b089" },
+  wave: { id: "wave-maker", name: { he: "ווייב מייקר", en: "Wave Maker" }, hex: "#1a8a9a" },
+  storm: { id: "storm-cloud", name: { he: "סטורם קלאוד", en: "Storm Cloud" }, hex: "#5c5e62" },
+  cypress: { id: "cypress", name: { he: "סייפרס", en: "Cypress" }, hex: "#3f4a40" },
+  wood: { id: "woodland", name: { he: "וודלנד", en: "Woodland" }, hex: "#6a6e68" },
+  meteor: { id: "meteor", name: { he: "מטאור", en: "Meteor" }, hex: "#3a4146" },
+  trail: { id: "trail-dust", name: { he: "טרייל דאסט", en: "Trail Dust" }, hex: "#9a947c" },
+  iceberg: { id: "iceberg", name: { he: "אייסברג", en: "Iceberg" }, hex: "#2a2a2a" },
+  magnetic: { id: "magnetic-gray", name: { he: "אפור מגנטי", en: "Magnetic Gray" }, hex: "#4b4b4b" },
   hWhite: { id: "white", name: { he: "לבן פנינה", en: "Platinum White" }, hex: "#f4f4f1" },
   hBlack: { id: "black", name: { he: "שחור קריסטל", en: "Crystal Black" }, hex: "#111111" },
   hRed: { id: "red", name: { he: "אדום ראלי", en: "Rallye Red" }, hex: "#c1121f" },
@@ -107,7 +115,7 @@ export const CARS: Car[] = [
       hybrid: true,
       defaultTrim: "xse",
       defaultColor: "supersonic-red",
-      colors: [P.red, P.ice, P.silver, P.metal, P.ocean],
+      colors: [P.red, P.ice],
       trims: [
         { id: "le", name: { he: "LE", en: "LE" }, blurb: { he: "בסיס היברידי עם מסך 8״.", en: "Hybrid base with 8\" screen." } },
         { id: "se", name: { he: "SE", en: "SE" }, blurb: { he: "מתלים ספורטיביים וגלגלי 18״.", en: "Sport-tuned suspension and 18\" wheels." } },
@@ -139,8 +147,8 @@ export const CARS: Car[] = [
     {
       hybrid: true,
       defaultTrim: "limited",
-      defaultColor: "supersonic-red",
-      colors: [P.red, P.ice, P.black, P.wind, P.blue],
+      defaultColor: "storm-cloud",
+      colors: [P.storm, P.cypress],
       trims: [
         { id: "xle", name: { he: "XLE", en: "XLE" }, blurb: { he: "שלושה טורים ומסך גדול.", en: "Three rows and a large screen." } },
         { id: "limited", name: { he: "Limited", en: "Limited" }, blurb: { he: "ציוד עשיר והיבריד.", en: "Loaded hybrid." } },
@@ -170,8 +178,8 @@ export const CARS: Car[] = [
     {
       hybrid: true,
       defaultTrim: "xse",
-      defaultColor: "supersonic-red",
-      colors: [P.red, P.ice, P.black, P.blue, P.silver],
+      defaultColor: "woodland",
+      colors: [P.wood],
       trims: [
         { id: "le", name: { he: "LE", en: "LE" }, blurb: { he: "בסיס משפחתי היברידי.", en: "Hybrid family base." } },
         { id: "xse", name: { he: "XSE", en: "XSE" }, blurb: { he: "עיצוב ספורטיבי.", en: "Sportier look." } },
@@ -199,8 +207,8 @@ export const CARS: Car[] = [
     5,
     {
       defaultTrim: "trd-pro",
-      defaultColor: "solar-octane",
-      colors: [P.octane, P.ice, P.black, P.lunar, P.under],
+      defaultColor: "wave-maker",
+      colors: [P.wave, P.ice],
       trims: [
         { id: "sr5", name: { he: "SR5", en: "SR5" }, blurb: { he: "בסיס שטח.", en: "Off-road base." } },
         { id: "trd-pro", name: { he: "TRD Pro", en: "TRD Pro" }, blurb: { he: "קצה השטח של טויוטה.", en: "Toyota's off-road peak." } },
@@ -229,8 +237,8 @@ export const CARS: Car[] = [
       hybrid: true,
       plugin: true,
       defaultTrim: "se",
-      defaultColor: "supersonic-red",
-      colors: [P.red, P.ice, P.black, P.silver, P.blue],
+      defaultColor: "midnight-black",
+      colors: [P.black, P.blue, P.metal],
       trims: [
         { id: "se", name: { he: "SE", en: "SE" }, blurb: { he: "פלאג־אין ספורטיבי.", en: "Sporty plug-in." } },
         { id: "xse", name: { he: "XSE", en: "XSE" }, blurb: { he: "גימור גבוה יותר.", en: "Higher trim." } },
@@ -258,8 +266,8 @@ export const CARS: Car[] = [
     {
       hybrid: true,
       defaultTrim: "1958",
-      defaultColor: "sand-dune",
-      colors: [P.sand, P.ice, P.black, P.under, P.lunar],
+      defaultColor: "meteor",
+      colors: [P.meteor, P.trail, P.iceberg],
       trims: [
         { id: "1958", name: { he: "1958", en: "1958" }, blurb: { he: "עיצוב מורשת.", en: "Heritage look." } },
         { id: "land-cruiser", name: { he: "Land Cruiser", en: "Land Cruiser" }, blurb: { he: "גימור מלא.", en: "Full trim." } },
@@ -287,8 +295,8 @@ export const CARS: Car[] = [
     {
       hybrid: true,
       defaultTrim: "capstone",
-      defaultColor: "midnight-black",
-      colors: [P.black, P.ice, P.silver, P.wind, P.under],
+      defaultColor: "supersonic-red",
+      colors: [P.red, P.ice, P.black, P.silver, P.cypress, P.blue, P.magnetic],
       trims: [
         { id: "sr5", name: { he: "SR5", en: "SR5" }, blurb: { he: "בסיס משפחתי גדול.", en: "Big family base." } },
         { id: "capstone", name: { he: "Capstone", en: "Capstone" }, blurb: { he: "פרימיום מלא.", en: "Full premium." } },
@@ -451,6 +459,6 @@ export function colorsForTrim(car: Car, trimId: string): Paint[] {
   return car.colors.filter((c) => trim.colors!.includes(c.id));
 }
 export function carImage(car: Car) {
-  const src = catalogSrc(car.slug, car.defaultColor);
-  return src || `/cars/fallback.svg`;
+  if (car.brand === "honda") return hondaSrc(car.slug);
+  return catalogSrc(car.slug, car.defaultColor) || `/cars/fallback.svg`;
 }

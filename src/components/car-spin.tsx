@@ -1,18 +1,18 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { frameCount, toyotaCombo, toyotaUrl } from "@/lib/visualizer";
+import { frameCount, hondaSrc, jellySrc, toyotaCombo } from "@/lib/visualizer";
 
 export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string; alt: string }) {
   const combo = toyotaCombo(slug);
   const total = frameCount(slug);
-  const [frame, setFrame] = useState(29);
+  const [frame, setFrame] = useState(combo?.catalogFrame ?? 1);
   const [ready, setReady] = useState(0);
   const drag = useRef<{ x: number; start: number } | null>(null);
 
   const urls = useMemo(() => {
     if (!combo) return [] as string[];
-    return Array.from({ length: total }, (_, i) => toyotaUrl(combo, paintId, i + 1, 1100));
-  }, [combo, paintId, total]);
+    return Array.from({ length: total }, (_, i) => jellySrc(slug, paintId, i + 1));
+  }, [combo, paintId, slug, total]);
 
   useEffect(() => {
     if (!urls.length) return;
@@ -20,7 +20,6 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
     setReady(0);
     urls.forEach((src) => {
       const img = new Image();
-      img.referrerPolicy = "no-referrer";
       img.onload = () => {
         if (live) setReady((n) => n + 1);
       };
@@ -30,6 +29,11 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
       live = false;
     };
   }, [urls]);
+
+  useEffect(() => {
+    if (!combo) return;
+    setFrame((f) => Math.min(Math.max(1, f), total));
+  }, [combo, total]);
 
   function move(dx: number) {
     const tick = 7;
@@ -58,7 +62,7 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
   if (!combo) {
     return (
       <div className="grid aspect-[16/9] place-items-center bg-studio text-studio-fg">
-        <p className="text-sm text-quiet">{alt}</p>
+        <img src={hondaSrc(slug)} alt={alt} className="size-full object-contain" />
       </div>
     );
   }
@@ -77,7 +81,6 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
             key={src}
             src={src}
             alt=""
-            referrerPolicy="no-referrer"
             draggable={false}
             className="absolute inset-0 size-full object-contain"
             style={{ opacity: i + 1 === frame ? 1 : 0 }}
