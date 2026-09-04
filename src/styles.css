@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Heebo", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Heebo", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: #f3f3f1;
+  --color-fg: #161616;
+  --color-muted: #5a5a5a;
+  --color-subtle: #8a8a8a;
+  --color-paper: #ffffff;
+  --color-ink: #161616;
+  --color-quiet: #5c5c5c;
+  --color-mist: #ecece8;
+  --color-chrome: #111111;
+  --color-chrome-fg: #f4f4f4;
+  --color-chrome-muted: #a8a8a8;
+  --color-brand: #e10600;
+  --color-brand-dark: #b50500;
+  --color-accent: #e10600;
+  --color-accent-foreground: #ffffff;
+  --color-border: rgb(22 22 22 / 0.12);
+  --color-rule: rgb(22 22 22 / 0.12);
+  --color-ring: #e10600;
+  --color-whatsapp: #1f6b46;
+  --color-studio: #ffffff;
+  --color-studio-fg: #171717;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  a {
+    color: inherit;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+}
+
+@layer utilities {
+  .font-wordmark {
+    font-family: "Oswald", "Heebo", ui-sans-serif, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+  }
+  .rail-scroll {
+    scrollbar-width: none;
+  }
+  .rail-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
