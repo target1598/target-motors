@@ -85,6 +85,10 @@ export type Copy = {
     highlights: string;
     quoteTitle: string;
     quoteBody: string;
+    prevAngle: string;
+    nextAngle: string;
+    fullscreen: string;
+    exitFullscreen: string;
   };
   notFound: { title: string; body: string };
 };
@@ -221,6 +225,10 @@ export const copy: Record<Lang, Copy> = {
       highlights: "עיקרי הדגם",
       quoteTitle: "הצעת מחיר",
       quoteBody: "אין מחיר באתר. שלחו פנייה ונחזור עם זמינות ומספר.",
+      prevAngle: "זווית קודמת",
+      nextAngle: "זווית הבאה",
+      fullscreen: "מסך מלא",
+      exitFullscreen: "יציאה ממסך מלא",
     },
     notFound: { title: "העמוד לא נמצא", body: "חזרו לדף הבית או לדגמים." },
   },
@@ -355,6 +363,10 @@ export const copy: Record<Lang, Copy> = {
       highlights: "Highlights",
       quoteTitle: "Request a quote",
       quoteBody: "No price on the site. Send a request and we return availability and a number.",
+      prevAngle: "Previous angle",
+      nextAngle: "Next angle",
+      fullscreen: "Full screen",
+      exitFullscreen: "Exit full screen",
     },
     notFound: { title: "Page not found", body: "Go back home or to the models." },
   },

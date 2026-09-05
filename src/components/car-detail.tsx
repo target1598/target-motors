@@ -41,16 +41,14 @@ export function CarDetail({ car }: { car: Car }) {
   return (
     <article>
       <div className="relative bg-studio text-studio-fg">
-        <div className="relative mx-auto max-w-6xl px-5 pt-4 sm:px-8 sm:pt-6">
-          <Link
-            to={car.brand === "toyota" ? "/toyota" : "/honda"}
-            className="inline-flex w-fit items-center gap-2 text-sm text-studio-fg/70 hover:text-studio-fg"
-          >
-            <Back className="size-4" />
-            {t.car.back}
-          </Link>
-          <CarSpin slug={car.slug} paintId={color.id} alt={`${car.name[lang]} — ${color.name[lang]}`} />
-        </div>
+        <Link
+          to={car.brand === "toyota" ? "/toyota" : "/honda"}
+          className="absolute start-5 top-4 z-20 inline-flex w-fit items-center gap-2 text-sm text-studio-fg/70 hover:text-studio-fg sm:start-8 sm:top-6"
+        >
+          <Back className="size-4" />
+          {t.car.back}
+        </Link>
+        <CarSpin slug={car.slug} paintId={color.id} alt={`${car.name[lang]} — ${color.name[lang]}`} />
       </div>
 
       <div className="border-b border-rule bg-paper text-ink">

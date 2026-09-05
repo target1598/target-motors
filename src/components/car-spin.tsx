@@ -1,13 +1,18 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { frameCount, hondaSrc, jellySrc, toyotaCombo } from "@/lib/visualizer";
+import { useLanguage } from "@/lib/language";
+import { cn } from "@/lib/utils";
 
 export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string; alt: string }) {
+  const { t } = useLanguage();
   const combo = toyotaCombo(slug);
   const total = frameCount(slug);
   const [frame, setFrame] = useState(combo?.catalogFrame ?? 1);
-  const [ready, setReady] = useState(0);
-  const drag = useRef<{ x: number; start: number } | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [grabbing, setGrabbing] = useState(false);
+  const drag = useRef<{ x: number; leftover: number } | null>(null);
 
   const urls = useMemo(() => {
     if (!combo) return [] as string[];
@@ -16,18 +21,10 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
 
   useEffect(() => {
     if (!urls.length) return;
-    let live = true;
-    setReady(0);
     urls.forEach((src) => {
       const img = new Image();
-      img.onload = () => {
-        if (live) setReady((n) => n + 1);
-      };
       img.src = src;
     });
-    return () => {
-      live = false;
-    };
   }, [urls]);
 
   useEffect(() => {
@@ -35,82 +32,148 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
     setFrame((f) => Math.min(Math.max(1, f), total));
   }, [combo, total]);
 
-  function move(dx: number) {
-    const tick = 7;
-    const steps = Math.trunc(dx / tick);
-    if (!steps) return;
-    setFrame((f) => {
-      const next = (((f - 1 + steps) % total) + total) % total;
-      return next + 1;
-    });
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") step(1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [expanded, total]);
+
+  function step(delta: number) {
+    setFrame((f) => ((((f - 1 + delta) % total) + total) % total) + 1);
   }
 
   function onPointerDown(e: React.PointerEvent) {
+    if (!combo) return;
+    if ((e.target as HTMLElement).closest("button")) return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    drag.current = { x: e.clientX, start: frame };
+    drag.current = { x: e.clientX, leftover: 0 };
+    setGrabbing(true);
   }
+
   function onPointerMove(e: React.PointerEvent) {
-    if (!drag.current) return;
+    if (!drag.current || !combo) return;
     const dx = e.clientX - drag.current.x;
     drag.current.x = e.clientX;
-    move(-dx);
+    drag.current.leftover += -dx;
+    const tick = 5;
+    const steps = Math.trunc(drag.current.leftover / tick);
+    if (!steps) return;
+    drag.current.leftover -= steps * tick;
+    step(steps);
   }
+
   function onPointerUp() {
     drag.current = null;
+    setGrabbing(false);
   }
 
-  if (!combo) {
-    return (
-      <div className="grid aspect-[16/9] place-items-center bg-studio text-studio-fg">
-        <img src={hondaSrc(slug)} alt={alt} className="size-full object-contain" />
-      </div>
-    );
-  }
+  const still = !combo ? hondaSrc(slug) : null;
 
-  return (
-    <div className="relative select-none bg-studio text-studio-fg">
+  const stage = (
+    <div
+      className={cn(
+        "relative select-none bg-studio text-studio-fg",
+        expanded ? "fixed inset-0 z-[60] flex flex-col" : "min-h-[56vh] sm:min-h-[64vh] lg:min-h-[72vh]",
+      )}
+    >
       <div
-        className="relative aspect-[16/9] cursor-ew-resize touch-none"
+        className={cn(
+          "relative touch-none",
+          expanded ? "h-full w-full" : "min-h-[56vh] sm:min-h-[64vh] lg:min-h-[72vh]",
+          grabbing ? "cursor-grabbing" : "cursor-grab",
+        )}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        {urls.map((src, i) => (
-          <img
-            key={src}
-            src={src}
-            alt=""
-            draggable={false}
-            className="absolute inset-0 size-full object-contain"
-            style={{ opacity: i + 1 === frame ? 1 : 0 }}
-          />
-        ))}
+        {still ? (
+          <img src={still} alt={alt} draggable={false} className="absolute inset-0 size-full object-contain" />
+        ) : (
+          urls.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 size-full object-contain"
+              style={{ opacity: i + 1 === frame ? 1 : 0 }}
+            />
+          ))
+        )}
         <span className="sr-only">{alt}</span>
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center gap-2">
+
+        {combo ? (
+          <>
+            <NavButton
+              side="left"
+              label={t.car.prevAngle}
+              onClick={() => step(-1)}
+            >
+              <ChevronLeft className="size-5" strokeWidth={1.75} />
+            </NavButton>
+            <NavButton
+              side="right"
+              label={t.car.nextAngle}
+              onClick={() => step(1)}
+            >
+              <ChevronRight className="size-5" strokeWidth={1.75} />
+            </NavButton>
+          </>
+        ) : null}
+
         <button
           type="button"
-          className="pointer-events-auto grid size-11 place-items-center rounded-full bg-ink/80 text-paper"
-          onClick={() => setFrame((f) => ((f - 2 + total) % total) + 1)}
-          aria-label="Previous angle"
+          onClick={() => setExpanded((v) => !v)}
+          className="absolute right-4 bottom-4 z-10 grid size-11 place-items-center text-neutral-700 hover:text-black sm:right-6 sm:bottom-6"
+          aria-label={expanded ? t.car.exitFullscreen : t.car.fullscreen}
         >
-          <ChevronLeft className="size-5" />
-        </button>
-        <button
-          type="button"
-          className="pointer-events-auto grid size-11 place-items-center rounded-full bg-ink/80 text-paper"
-          onClick={() => setFrame((f) => (f % total) + 1)}
-          aria-label="Next angle"
-        >
-          <ChevronRight className="size-5" />
+          {expanded ? <Minimize2 className="size-5" strokeWidth={1.6} /> : <Maximize2 className="size-5" strokeWidth={1.6} />}
         </button>
       </div>
-      {ready < total ? (
-        <p className="absolute start-4 top-4 text-[11px] uppercase tracking-wider text-quiet">
-          {ready}/{total}
-        </p>
-      ) : null}
     </div>
+  );
+
+  return (
+    <>
+      {expanded ? <div className="min-h-[56vh] bg-studio sm:min-h-[64vh] lg:min-h-[72vh]" aria-hidden /> : null}
+      {expanded && typeof document !== "undefined" ? createPortal(stage, document.body) : stage}
+    </>
+  );
+}
+
+function NavButton({
+  side,
+  label,
+  onClick,
+  children,
+}: {
+  side: "left" | "right";
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={cn(
+        "absolute top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-black/18 bg-white text-neutral-800 shadow-[0_1px_2px_rgba(0,0,0,0.06)] transition-colors hover:bg-neutral-50 sm:size-11",
+        side === "left" ? "left-3 sm:left-5" : "right-3 sm:right-5",
+      )}
+    >
+      {children}
+    </button>
   );
 }
