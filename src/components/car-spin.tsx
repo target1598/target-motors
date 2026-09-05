@@ -83,13 +83,13 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
     <div
       className={cn(
         "relative select-none bg-studio text-studio-fg",
-        expanded ? "fixed inset-0 z-[60] flex flex-col" : "min-h-[56vh] sm:min-h-[64vh] lg:min-h-[72vh]",
+        expanded ? "fixed inset-0 z-[60] flex flex-col" : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
       )}
     >
       <div
         className={cn(
           "relative touch-none",
-          expanded ? "h-full w-full" : "min-h-[56vh] sm:min-h-[64vh] lg:min-h-[72vh]",
+          expanded ? "h-full w-full" : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
           grabbing ? "cursor-grabbing" : "cursor-grab",
         )}
         onPointerDown={onPointerDown}
@@ -146,7 +146,7 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
 
   return (
     <>
-      {expanded ? <div className="min-h-[56vh] bg-studio sm:min-h-[64vh] lg:min-h-[72vh]" aria-hidden /> : null}
+      {expanded ? <div className="min-h-[48vh] bg-studio sm:min-h-[54vh] lg:min-h-[60vh]" aria-hidden /> : null}
       {expanded && typeof document !== "undefined" ? createPortal(stage, document.body) : stage}
     </>
   );
