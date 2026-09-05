@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { carImage, type Car } from "@/lib/cars";
+import { cardFit } from "@/lib/visualizer";
 import { useLanguage } from "@/lib/language";
 
 export function CarRail({ cars }: { cars: Car[] }) {
@@ -13,11 +14,12 @@ export function CarRail({ cars }: { cars: Car[] }) {
           params={{ slug: car.slug }}
           className="group w-[78vw] max-w-md shrink-0 snap-center sm:w-[42vw] lg:w-[30vw]"
         >
-          <div className="aspect-[16/9] overflow-hidden bg-transparent">
+          <div className="relative aspect-[16/9] overflow-hidden bg-transparent">
             <img
               src={carImage(car)}
               alt={car.name[lang]}
-              className="size-full object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+              style={{ width: `${cardFit(car.slug) * 100}%`, height: `${cardFit(car.slug) * 100}%` }}
               onError={(e) => {
                 e.currentTarget.src = `${import.meta.env.BASE_URL}cars/fallback.svg`;
               }}

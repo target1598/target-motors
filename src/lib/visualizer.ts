@@ -33,6 +33,13 @@ export function studioFit(slug: string) {
   return toyotaCombo(slug)?.fit ?? 1;
 }
 
+/** Listing tiles: a notch larger than the 360 studio, same 3/4 hero angle. */
+export function cardFit(slug: string) {
+  const fit = studioFit(slug);
+  if (fit >= 0.95) return 1.16;
+  return Math.min(0.88, fit + 0.18);
+}
+
 export function jellySrc(slug: string, paintId: string, frame: number) {
   return `${baseUrl()}jellies/${slug}/${paintId}/${frame}.webp`;
 }
