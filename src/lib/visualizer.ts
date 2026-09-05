@@ -11,6 +11,11 @@ const COMBOS: Record<string, ToyotaCombo> = {
   "rav4-prime": { frameCount: 18, catalogFrame: 14 },
   "land-cruiser": { frameCount: 18, catalogFrame: 14 },
   sequoia: { frameCount: 36, catalogFrame: 29 },
+  civic: { frameCount: 36, catalogFrame: 1 },
+  "cr-v": { frameCount: 36, catalogFrame: 1 },
+  accord: { frameCount: 36, catalogFrame: 1 },
+  pilot: { frameCount: 36, catalogFrame: 1 },
+  odyssey: { frameCount: 36, catalogFrame: 1 },
 };
 
 function baseUrl() {
