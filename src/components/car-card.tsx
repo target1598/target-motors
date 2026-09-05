@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { BODY_LABEL, carImage, type Car } from "@/lib/cars";
+import { carImage, BODY_LABEL, type Car } from "@/lib/cars";
+import { studioFit } from "@/lib/visualizer";
 import { useLanguage } from "@/lib/language";
 
 export function CarCard({ car }: { car: Car }) {
@@ -18,7 +19,8 @@ export function CarCard({ car }: { car: Car }) {
         <img
           src={carImage(car)}
           alt={car.name[lang]}
-          className="size-full object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain transition-transform duration-500 group-hover:scale-[1.04]"
+          style={{ width: `${studioFit(car.slug) * 100}%`, height: `${studioFit(car.slug) * 100}%` }}
           onError={(e) => {
             e.currentTarget.src = `${import.meta.env.BASE_URL}cars/fallback.svg`;
           }}

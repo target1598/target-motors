@@ -1,21 +1,23 @@
 export type ToyotaCombo = {
   frameCount: number;
   catalogFrame: number;
+  /** How much of the studio the asset should fill. Tight crops need a smaller number. */
+  fit: number;
 };
 
 const COMBOS: Record<string, ToyotaCombo> = {
-  camry: { frameCount: 36, catalogFrame: 29 },
-  "grand-highlander": { frameCount: 36, catalogFrame: 29 },
-  sienna: { frameCount: 36, catalogFrame: 29 },
-  "4runner": { frameCount: 36, catalogFrame: 29 },
-  "rav4-prime": { frameCount: 18, catalogFrame: 14 },
-  "land-cruiser": { frameCount: 18, catalogFrame: 14 },
-  sequoia: { frameCount: 36, catalogFrame: 29 },
-  civic: { frameCount: 36, catalogFrame: 1 },
-  "cr-v": { frameCount: 36, catalogFrame: 1 },
-  accord: { frameCount: 36, catalogFrame: 1 },
-  pilot: { frameCount: 36, catalogFrame: 1 },
-  odyssey: { frameCount: 36, catalogFrame: 1 },
+  camry: { frameCount: 36, catalogFrame: 29, fit: 0.62 },
+  "grand-highlander": { frameCount: 36, catalogFrame: 29, fit: 0.64 },
+  sienna: { frameCount: 36, catalogFrame: 29, fit: 0.62 },
+  "4runner": { frameCount: 36, catalogFrame: 29, fit: 0.62 },
+  "rav4-prime": { frameCount: 18, catalogFrame: 14, fit: 0.64 },
+  "land-cruiser": { frameCount: 18, catalogFrame: 14, fit: 0.62 },
+  sequoia: { frameCount: 36, catalogFrame: 29, fit: 0.64 },
+  civic: { frameCount: 36, catalogFrame: 1, fit: 0.5 },
+  "cr-v": { frameCount: 36, catalogFrame: 1, fit: 1 },
+  accord: { frameCount: 36, catalogFrame: 1, fit: 1 },
+  pilot: { frameCount: 36, catalogFrame: 1, fit: 1 },
+  odyssey: { frameCount: 36, catalogFrame: 1, fit: 1 },
 };
 
 function baseUrl() {
@@ -25,6 +27,10 @@ function baseUrl() {
 
 export function toyotaCombo(slug: string): ToyotaCombo | null {
   return COMBOS[slug] ?? null;
+}
+
+export function studioFit(slug: string) {
+  return toyotaCombo(slug)?.fit ?? 1;
 }
 
 export function jellySrc(slug: string, paintId: string, frame: number) {

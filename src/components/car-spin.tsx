@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { frameCount, hondaSrc, jellySrc, toyotaCombo } from "@/lib/visualizer";
+import { frameCount, hondaSrc, jellySrc, studioFit, toyotaCombo } from "@/lib/visualizer";
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
   const { t } = useLanguage();
   const combo = toyotaCombo(slug);
   const total = frameCount(slug);
+  const fit = studioFit(slug);
   const [frame, setFrame] = useState(combo?.catalogFrame ?? 1);
   const [expanded, setExpanded] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
@@ -98,7 +99,13 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
         onPointerCancel={onPointerUp}
       >
         {still ? (
-          <img src={still} alt={alt} draggable={false} className="absolute inset-0 size-full object-contain" />
+          <img
+            src={still}
+            alt={alt}
+            draggable={false}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
+            style={{ width: `${fit * 100}%`, height: `${fit * 100}%` }}
+          />
         ) : (
           urls.map((src, i) => (
             <img
@@ -106,8 +113,12 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
               src={src}
               alt=""
               draggable={false}
-              className="absolute inset-0 size-full object-contain"
-              style={{ opacity: i + 1 === frame ? 1 : 0 }}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
+              style={{
+                opacity: i + 1 === frame ? 1 : 0,
+                width: `${fit * 100}%`,
+                height: `${fit * 100}%`,
+              }}
             />
           ))
         )}
