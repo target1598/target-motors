@@ -3,7 +3,7 @@ export const SPIN_PAINTS: Record<string, string[]> = {
   "4runner": ["ice-cap", "wave-maker"],
   "accord": ["canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
   "camry": ["ice-cap", "supersonic-red"],
-  "cr-v": ["ash-green-metallic", "canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
+  "cr-v": ["canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
   "grand-highlander": ["cypress", "storm-cloud"],
   "land-cruiser": ["iceberg", "meteor", "trail-dust"],
   "odyssey": ["crystal-black-pearl", "modern-steel-metallic", "platinum-white-pearl", "radiant-red-metallic-ii", "solar-silver-metallic", "sonic-grey-pearl"],
