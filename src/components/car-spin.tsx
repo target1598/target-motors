@@ -83,13 +83,13 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
   const stage = (
     <div
       className={cn(
-        "relative select-none bg-studio text-studio-fg",
+        "relative overflow-hidden select-none bg-studio text-studio-fg",
         expanded ? "fixed inset-0 z-[60] flex flex-col" : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
       )}
     >
       <div
         className={cn(
-          "relative touch-none",
+          "relative overflow-hidden touch-none",
           expanded ? "h-full w-full" : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
           grabbing ? "cursor-grabbing" : "cursor-grab",
         )}

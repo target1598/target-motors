@@ -13,10 +13,10 @@ const COMBOS: Record<string, ToyotaCombo> = {
   "rav4-prime": { frameCount: 18, catalogFrame: 16, fit: 0.64 },
   "land-cruiser": { frameCount: 18, catalogFrame: 16, fit: 0.62 },
   sequoia: { frameCount: 36, catalogFrame: 33, fit: 0.64 },
-  "cr-v": { frameCount: 36, catalogFrame: 6, fit: 1 },
-  accord: { frameCount: 36, catalogFrame: 6, fit: 1 },
-  pilot: { frameCount: 36, catalogFrame: 1, fit: 1 },
-  odyssey: { frameCount: 36, catalogFrame: 6, fit: 1 },
+  "cr-v": { frameCount: 36, catalogFrame: 6, fit: 1.7 },
+  accord: { frameCount: 36, catalogFrame: 6, fit: 1.7 },
+  pilot: { frameCount: 36, catalogFrame: 1, fit: 1.7 },
+  odyssey: { frameCount: 36, catalogFrame: 6, fit: 1.7 },
 };
 
 function baseUrl() {
@@ -36,8 +36,7 @@ export function studioFit(slug: string) {
 export function cardFit(slug: string) {
   const combo = toyotaCombo(slug);
   if (!combo) return 1;
-  // Honda listing tiles use catalog stills — fill the card.
-  if (combo.fit >= 0.95) return 1.2;
+  if (combo.fit >= 1) return Math.min(1.9, combo.fit + 0.12);
   return Math.min(0.88, combo.fit + 0.18);
 }
 

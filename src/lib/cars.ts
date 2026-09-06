@@ -458,8 +458,5 @@ export function colorsForTrim(car: Car, trimId: string): Paint[] {
   return car.colors.filter((c) => trim.colors!.includes(c.id));
 }
 export function carImage(car: Car) {
-  if (car.brand === "honda") {
-    return hondaSrc(car.slug) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
-  }
-  return catalogSrc(car.slug, car.defaultColor) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
+  return catalogSrc(car.slug, car.defaultColor) || hondaSrc(car.slug) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
 }
