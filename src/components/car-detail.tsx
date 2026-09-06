@@ -17,7 +17,7 @@ import {
 } from "@/lib/cars";
 import { whatsappHref } from "@/lib/company";
 import { useLanguage } from "@/lib/language";
-import { catalogSrc, hasInterior, hasTrimStill, interiorHasSpin, interiorSrc, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
+import { catalogSrc, hasInterior, hasTrimStill, interiorSrc, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
 
 export function CarDetail({ car }: { car: Car }) {
   const { lang, t, dir } = useLanguage();
@@ -57,15 +57,12 @@ export function CarDetail({ car }: { car: Car }) {
   }
 
   const spin = paintHasSpin(car.slug, color.id) && !hasTrimStill(car.slug, trim.id, color.id);
-  const interiorSpin = Boolean(interior && interiorHasSpin(car.slug, interior.id));
   const exteriorStill = hasTrimStill(car.slug, trim.id, color.id)
     ? trimStillSrc(car.slug, trim.id, color.id)
     : catalogSrc(car.slug, color.id) || null;
   const stillSrc =
-    view === "interior"
-      ? interior && !interiorSpin
-        ? interiorSrc(car.slug, interior.id, 1)
-        : null
+    view === "interior" && interior
+      ? interiorSrc(car.slug, interior.id, 1)
       : !spin
         ? exteriorStill
         : null;
@@ -101,7 +98,7 @@ export function CarDetail({ car }: { car: Car }) {
           }
           mode={view}
           interiorId={interior?.id}
-          stillSrc={view === "exterior" && !spin ? stillSrc : null}
+          stillSrc={stillSrc}
         />
       </div>
 

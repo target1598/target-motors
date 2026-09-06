@@ -2,7 +2,6 @@ import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  INTERIOR_FRAME_COUNT,
   frameCount,
   hondaSrc,
   interiorSrc,
@@ -31,7 +30,7 @@ export function CarSpin({
   const { t } = useLanguage();
   const combo = toyotaCombo(slug);
   const interior = mode === "interior" && interiorId;
-  const total = interior ? INTERIOR_FRAME_COUNT : frameCount(slug);
+  const total = interior ? 1 : frameCount(slug);
   const fit = interior ? 1 : stillSrc ? 0.92 : studioFit(slug);
   const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
   const [expanded, setExpanded] = useState(false);
@@ -39,13 +38,10 @@ export function CarSpin({
   const drag = useRef<{ x: number; leftover: number } | null>(null);
 
   const urls = useMemo(() => {
-    if (stillSrc) return [] as string[];
-    if (interior) {
-      return Array.from({ length: total }, (_, i) => interiorSrc(slug, interiorId!, i + 1));
-    }
+    if (stillSrc || interior) return [] as string[];
     if (!combo) return [] as string[];
     return Array.from({ length: total }, (_, i) => jellySrc(slug, paintId, i + 1));
-  }, [combo, interior, interiorId, paintId, slug, stillSrc, total]);
+  }, [combo, interior, paintId, slug, stillSrc, total]);
 
   useEffect(() => {
     if (!urls.length) return;
@@ -111,7 +107,7 @@ export function CarSpin({
     setGrabbing(false);
   }
 
-  const still = stillSrc || (!combo && !interior ? hondaSrc(slug) : null);
+  const still = stillSrc || (interior ? interiorSrc(slug, interiorId!, 1) : !combo ? hondaSrc(slug) : null);
 
   const stage = (
     <div
