@@ -6,13 +6,13 @@ export type ToyotaCombo = {
 };
 
 const COMBOS: Record<string, ToyotaCombo> = {
-  camry: { frameCount: 36, catalogFrame: 29, fit: 0.62 },
-  "grand-highlander": { frameCount: 36, catalogFrame: 29, fit: 0.64 },
-  sienna: { frameCount: 36, catalogFrame: 29, fit: 0.62 },
-  "4runner": { frameCount: 36, catalogFrame: 29, fit: 0.62 },
-  "rav4-prime": { frameCount: 18, catalogFrame: 14, fit: 0.64 },
-  "land-cruiser": { frameCount: 18, catalogFrame: 14, fit: 0.62 },
-  sequoia: { frameCount: 36, catalogFrame: 29, fit: 0.64 },
+  camry: { frameCount: 36, catalogFrame: 19, fit: 0.62 },
+  "grand-highlander": { frameCount: 36, catalogFrame: 19, fit: 0.64 },
+  sienna: { frameCount: 36, catalogFrame: 19, fit: 0.62 },
+  "4runner": { frameCount: 36, catalogFrame: 19, fit: 0.62 },
+  "rav4-prime": { frameCount: 18, catalogFrame: 10, fit: 0.64 },
+  "land-cruiser": { frameCount: 18, catalogFrame: 10, fit: 0.62 },
+  sequoia: { frameCount: 36, catalogFrame: 19, fit: 0.64 },
   civic: { frameCount: 36, catalogFrame: 1, fit: 0.5 },
   "cr-v": { frameCount: 36, catalogFrame: 1, fit: 1 },
   accord: { frameCount: 36, catalogFrame: 1, fit: 1 },
