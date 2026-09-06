@@ -1,24 +1,51 @@
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { frameCount, hondaSrc, jellySrc, studioFit, toyotaCombo } from "@/lib/visualizer";
+import {
+  INTERIOR_FRAME_COUNT,
+  frameCount,
+  hondaSrc,
+  interiorSrc,
+  jellySrc,
+  studioFit,
+  toyotaCombo,
+} from "@/lib/visualizer";
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
-export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string; alt: string }) {
+export function CarSpin({
+  slug,
+  paintId,
+  alt,
+  mode = "exterior",
+  interiorId,
+  stillSrc,
+}: {
+  slug: string;
+  paintId: string;
+  alt: string;
+  mode?: "exterior" | "interior";
+  interiorId?: string;
+  stillSrc?: string | null;
+}) {
   const { t } = useLanguage();
   const combo = toyotaCombo(slug);
-  const total = frameCount(slug);
-  const fit = studioFit(slug);
-  const [frame, setFrame] = useState(combo?.catalogFrame ?? 1);
+  const interior = mode === "interior" && interiorId;
+  const total = interior ? INTERIOR_FRAME_COUNT : frameCount(slug);
+  const fit = interior ? 1 : stillSrc ? 0.92 : studioFit(slug);
+  const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
   const [expanded, setExpanded] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
   const drag = useRef<{ x: number; leftover: number } | null>(null);
 
   const urls = useMemo(() => {
+    if (stillSrc) return [] as string[];
+    if (interior) {
+      return Array.from({ length: total }, (_, i) => interiorSrc(slug, interiorId!, i + 1));
+    }
     if (!combo) return [] as string[];
     return Array.from({ length: total }, (_, i) => jellySrc(slug, paintId, i + 1));
-  }, [combo, paintId, slug, total]);
+  }, [combo, interior, interiorId, paintId, slug, stillSrc, total]);
 
   useEffect(() => {
     if (!urls.length) return;
@@ -29,9 +56,13 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
   }, [urls]);
 
   useEffect(() => {
+    if (interior) {
+      setFrame(1);
+      return;
+    }
     if (!combo) return;
     setFrame((f) => Math.min(Math.max(1, f), total));
-  }, [combo, total]);
+  }, [combo, interior, interiorId, total]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -53,8 +84,10 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
     setFrame((f) => ((((f - 1 + delta) % total) + total) % total) + 1);
   }
 
+  const canSpin = urls.length > 1;
+
   function onPointerDown(e: React.PointerEvent) {
-    if (!combo) return;
+    if (!canSpin) return;
     if ((e.target as HTMLElement).closest("button")) return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     drag.current = { x: e.clientX, leftover: 0 };
@@ -62,11 +95,11 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
   }
 
   function onPointerMove(e: React.PointerEvent) {
-    if (!drag.current || !combo) return;
+    if (!drag.current || !canSpin) return;
     const dx = e.clientX - drag.current.x;
     drag.current.x = e.clientX;
     drag.current.leftover += -dx;
-    const tick = 5;
+    const tick = interior ? 8 : 5;
     const steps = Math.trunc(drag.current.leftover / tick);
     if (!steps) return;
     drag.current.leftover -= steps * tick;
@@ -78,7 +111,7 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
     setGrabbing(false);
   }
 
-  const still = !combo ? hondaSrc(slug) : null;
+  const still = stillSrc || (!combo && !interior ? hondaSrc(slug) : null);
 
   const stage = (
     <div
@@ -91,7 +124,7 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
         className={cn(
           "relative overflow-hidden touch-none",
           expanded ? "h-full w-full" : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
-          grabbing ? "cursor-grabbing" : "cursor-grab",
+          canSpin ? (grabbing ? "cursor-grabbing" : "cursor-grab") : "cursor-default",
         )}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -124,20 +157,12 @@ export function CarSpin({ slug, paintId, alt }: { slug: string; paintId: string;
         )}
         <span className="sr-only">{alt}</span>
 
-        {combo ? (
+        {canSpin ? (
           <>
-            <NavButton
-              side="left"
-              label={t.car.prevAngle}
-              onClick={() => step(-1)}
-            >
+            <NavButton side="left" label={t.car.prevAngle} onClick={() => step(-1)}>
               <ChevronLeft className="size-5" strokeWidth={1.75} />
             </NavButton>
-            <NavButton
-              side="right"
-              label={t.car.nextAngle}
-              onClick={() => step(1)}
-            >
+            <NavButton side="right" label={t.car.nextAngle} onClick={() => step(1)}>
               <ChevronRight className="size-5" strokeWidth={1.75} />
             </NavButton>
           </>

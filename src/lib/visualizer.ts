@@ -1,3 +1,5 @@
+import { INTERIORS as INTERIOR_MAP, INTERIOR_SPINS, SPIN_PAINTS as SPIN_MAP, TRIM_STILLS as TRIM_LIST } from "@/lib/assets.generated";
+
 export type ToyotaCombo = {
   frameCount: number;
   catalogFrame: number;
@@ -19,6 +21,17 @@ const COMBOS: Record<string, ToyotaCombo> = {
   odyssey: { frameCount: 36, catalogFrame: 23, fit: 1.85 },
 };
 
+const SPIN_PAINTS: Record<string, Set<string>> = Object.fromEntries(
+  Object.entries(SPIN_MAP).map(([slug, paints]) => [slug, new Set(paints)]),
+);
+const TRIM_STILLS = new Set(TRIM_LIST);
+const INTERIORS: Record<string, Set<string>> = Object.fromEntries(
+  Object.entries(INTERIOR_MAP).map(([slug, ids]) => [slug, new Set(ids)]),
+);
+const INTERIOR_SPIN = new Set(INTERIOR_SPINS);
+
+export const INTERIOR_FRAME_COUNT = 16;
+
 function baseUrl() {
   const base = import.meta.env.BASE_URL || "/";
   return base.endsWith("/") ? base : `${base}/`;
@@ -36,7 +49,6 @@ export function studioFit(slug: string) {
 export function cardFit(slug: string) {
   const combo = toyotaCombo(slug);
   if (!combo) return 1;
-  // Honda listing stills are already tight-cropped like Toyota jellies.
   if (combo.fit >= 1) return 0.82;
   return Math.min(0.88, combo.fit + 0.18);
 }
@@ -57,4 +69,28 @@ export function hondaSrc(slug: string) {
 
 export function frameCount(slug: string) {
   return toyotaCombo(slug)?.frameCount ?? 36;
+}
+
+export function paintHasSpin(slug: string, paintId: string) {
+  return SPIN_PAINTS[slug]?.has(paintId) ?? false;
+}
+
+export function hasTrimStill(slug: string, trimId: string, paintId: string) {
+  return TRIM_STILLS.has(`${slug}/${trimId}/${paintId}`);
+}
+
+export function trimStillSrc(slug: string, trimId: string, paintId: string) {
+  return `${baseUrl()}jellies/${slug}/trims/${trimId}/${paintId}.webp`;
+}
+
+export function hasInterior(slug: string, interiorId: string) {
+  return INTERIORS[slug]?.has(interiorId) ?? false;
+}
+
+export function interiorHasSpin(slug: string, interiorId: string) {
+  return INTERIOR_SPIN.has(`${slug}/${interiorId}`);
+}
+
+export function interiorSrc(slug: string, interiorId: string, frame: number) {
+  return `${baseUrl()}interiors/${slug}/${interiorId}/${frame}.webp`;
 }

@@ -79,6 +79,9 @@ export type Copy = {
     back: string;
     trim: string;
     color: string;
+    interiorColor: string;
+    exterior: string;
+    interior: string;
     plugin: string;
     fromUs: string;
     specs: string;
@@ -218,7 +221,10 @@ export const copy: Record<Lang, Copy> = {
     car: {
       back: "חזרה לדגמים",
       trim: "רמת גימור",
-      color: "צבע",
+      color: "צבע חוץ",
+      interiorColor: "צבע פנים",
+      exterior: "חוץ",
+      interior: "פנים",
       plugin: "פלאג־אין",
       fromUs: "מארה״ב",
       specs: "מפרט",
@@ -356,7 +362,10 @@ export const copy: Record<Lang, Copy> = {
     car: {
       back: "Back to models",
       trim: "Trim",
-      color: "Color",
+      color: "Exterior color",
+      interiorColor: "Interior color",
+      exterior: "Exterior",
+      interior: "Interior",
       plugin: "Plug-in",
       fromUs: "From the US",
       specs: "Spec",

@@ -2,12 +2,15 @@ import { catalogSrc, hondaSrc } from "@/lib/visualizer";
 
 export type Text = { he: string; en: string };
 export type Paint = { id: string; name: Text; hex: string };
+export type Interior = { id: string; name: Text; hex: string };
 export type Spec = { label: Text; value: Text };
 export type TrimLevel = {
   id: string;
   name: Text;
   blurb: Text;
   colors?: string[];
+  interiors?: string[];
+  distinctExterior?: boolean;
   specs?: Spec[];
   highlights?: Text[];
   hybrid?: boolean;
@@ -28,7 +31,9 @@ export type Car = {
   featured?: boolean;
   defaultTrim: string;
   defaultColor: string;
+  defaultInterior: string;
   colors: Paint[];
+  interiors: Interior[];
   trims: TrimLevel[];
   specs: Spec[];
   highlights: Text[];
@@ -67,6 +72,13 @@ const P = {
   trail: { id: "trail-dust", name: { he: "טרייל דאסט", en: "Trail Dust" }, hex: "#9a947c" },
   iceberg: { id: "iceberg", name: { he: "אייסברג", en: "Iceberg" }, hex: "#2a2a2a" },
   magnetic: { id: "magnetic-gray", name: { he: "אפור מגנטי", en: "Magnetic Gray" }, hex: "#4b4b4b" },
+  cosmos: { id: "dark-cosmos", name: { he: "דארק קוסמוס", en: "Dark Cosmos" }, hex: "#2a3348" },
+  reservoir: { id: "reservoir-blue", name: { he: "רזרבואר בלו", en: "Reservoir Blue" }, hex: "#3d5c78" },
+  ruby: { id: "ruby-flare", name: { he: "רובי פלייר", en: "Ruby Flare Pearl" }, hex: "#7a1a22" },
+  cement: { id: "cement", name: { he: "סמנט", en: "Cement" }, hex: "#8b8d88" },
+  heritage: { id: "heritage-blue", name: { he: "הריטג׳ בלו", en: "Heritage Blue" }, hex: "#2c4c6e" },
+  everest: { id: "everest", name: { he: "אוורסט", en: "Everest" }, hex: "#4a5c48" },
+  cutting: { id: "cutting-edge", name: { he: "קאטינג אדג׳", en: "Cutting Edge" }, hex: "#c4c4bc" },
   hWhite: { id: "platinum-white-pearl", name: { he: "פלטינום וייט פירל", en: "Platinum White Pearl" }, hex: "#f4f4f1" },
   hBlack: { id: "crystal-black-pearl", name: { he: "קריסטל בלק פירל", en: "Crystal Black Pearl" }, hex: "#111111" },
   hRed: { id: "rallye-red", name: { he: "ראלי רד", en: "Rallye Red" }, hex: "#b23232" },
@@ -81,6 +93,30 @@ const P = {
   hSteel: { id: "modern-steel-metallic", name: { he: "מודרן סטיל", en: "Modern Steel Metallic" }, hex: "#5b5b5b" },
   hSonic: { id: "sonic-grey-pearl", name: { he: "סוניק גריי פירל", en: "Sonic Gray Pearl" }, hex: "#55616a" },
   hAsh: { id: "ash-green-metallic", name: { he: "אש גרין", en: "Ash Green Metallic" }, hex: "#515850" },
+  hSmoke: { id: "smoke-blue-pearl", name: { he: "סמוק בלו פירל", en: "Smoke Blue Pearl" }, hex: "#5a6d7c" },
+};
+
+const I = {
+  boulder: { id: "boulder-fabric", name: { he: "בד בולדר", en: "Boulder fabric" }, hex: "#9a9b94" },
+  blackSoftex: { id: "black-softex", name: { he: "סופטקס שחור", en: "Black SofTex" }, hex: "#1c1c1c" },
+  grayLeather: { id: "light-gray-leather", name: { he: "עור אפור בהיר", en: "Light gray leather" }, hex: "#c4c5c0" },
+  cockpit: { id: "cockpit-red", name: { he: "קוקפיט רד", en: "Cockpit Red" }, hex: "#7a1c24" },
+  grayFabric: { id: "gray-fabric", name: { he: "בד אפור", en: "Gray fabric" }, hex: "#8d8e89" },
+  graySoftex: { id: "gray-softex", name: { he: "סופטקס אפור", en: "Gray SofTex" }, hex: "#7a7b76" },
+  moonstone: { id: "moonstone-softex", name: { he: "מונסטון / שחור", en: "Moonstone/Black SofTex" }, hex: "#d5d4ce" },
+  blackLeather: { id: "black-leather", name: { he: "עור שחור", en: "Black leather" }, hex: "#141414" },
+  macadamia: { id: "macadamia-leather", name: { he: "מקדמיה", en: "Macadamia leather" }, hex: "#c4ad8c" },
+  blackFabric: { id: "black-fabric", name: { he: "בד שחור", en: "Black fabric" }, hex: "#222222" },
+  portobello: { id: "portobello-leather", name: { he: "פורטובלו", en: "Portobello leather" }, hex: "#6b5344" },
+  nightshadeBlack: { id: "nightshade-black", name: { he: "נייטשייד שחור", en: "Nightshade black" }, hex: "#111111" },
+  grayUltrasuede: { id: "gray-ultrasuede", name: { he: "אולטרסוויד אפור", en: "Gray Ultrasuede" }, hex: "#9a9b98" },
+  platUltra: { id: "platinum-ultrasuede", name: { he: "אולטרסוויד פלטינום", en: "Platinum Ultrasuede" }, hex: "#b7b6b1" },
+  ghGrayLeather: { id: "gray-leather", name: { he: "עור אפור", en: "Gray leather" }, hex: "#8e8f8a" },
+  blackCloth: { id: "black-cloth", name: { he: "בד שחור", en: "Black cloth" }, hex: "#1a1a1a" },
+  hBlackLeather: { id: "black-leather", name: { he: "עור שחור", en: "Black leather" }, hex: "#161616" },
+  hGrayLeather: { id: "gray-leather", name: { he: "עור אפור", en: "Gray leather" }, hex: "#8a8b88" },
+  trailBlack: { id: "trailsport-black", name: { he: "TrailSport שחור", en: "TrailSport black" }, hex: "#1a1a1a" },
+  hBlackPerf: { id: "black-perforated", name: { he: "עור שחור מחורר", en: "Black perforated leather" }, hex: "#1a1a1a" },
 };
 
 function toyota(
@@ -90,7 +126,7 @@ function toyota(
   description: Text,
   body: Car["body"],
   seats: number,
-  extra: Partial<Car> & { trims: TrimLevel[]; colors: Paint[]; specs: Spec[]; highlights: Text[] },
+  extra: Partial<Car> & { trims: TrimLevel[]; colors: Paint[]; interiors: Interior[]; specs: Spec[]; highlights: Text[] },
 ): Car {
   return {
     slug,
@@ -104,6 +140,7 @@ function toyota(
     featured: true,
     defaultTrim: extra.trims[0]?.id ?? "le",
     defaultColor: extra.defaultColor ?? extra.colors[0]?.id ?? "ice-cap",
+    defaultInterior: extra.defaultInterior ?? extra.interiors[0]?.id ?? "black-softex",
     ...extra,
   };
 }
@@ -123,13 +160,49 @@ export const CARS: Car[] = [
       hybrid: true,
       defaultTrim: "xse",
       defaultColor: "supersonic-red",
-      colors: [P.red, P.ice],
+      defaultInterior: "cockpit-red",
+      colors: [P.red, P.ice, P.black, P.wind, P.silver, P.under, P.metal, P.ocean, P.reservoir, P.cosmos],
+      interiors: [I.boulder, I.blackSoftex, I.grayLeather, I.cockpit],
       trims: [
-        { id: "le", name: { he: "LE", en: "LE" }, blurb: { he: "בסיס היברידי עם מסך 8״.", en: "Hybrid base with 8\" screen." } },
-        { id: "se", name: { he: "SE", en: "SE" }, blurb: { he: "מתלים ספורטיביים וגלגלי 18״.", en: "Sport-tuned suspension and 18\" wheels." } },
-        { id: "nightshade", name: { he: "Nightshade", en: "Nightshade" }, blurb: { he: "חבילת שחור חיצונית.", en: "Blacked-out exterior package." } },
-        { id: "xle", name: { he: "XLE", en: "XLE" }, blurb: { he: "נוחות ועור.", en: "Comfort and leather." } },
-        { id: "xse", name: { he: "XSE", en: "XSE" }, blurb: { he: "גלגלי 19״ ונוכחות ספורטיבית.", en: "19\" wheels and sport presence." } },
+        {
+          id: "le",
+          name: { he: "LE", en: "LE" },
+          blurb: { he: "בסיס היברידי עם מסך 8״ ובד Boulder או שחור.", en: "Hybrid base with 8\" screen and Boulder or black fabric." },
+          colors: ["ice-cap", "midnight-black", "celestial-silver", "underground", "ocean-gem", "reservoir-blue", "supersonic-red"],
+          interiors: ["boulder-fabric"],
+        },
+        {
+          id: "se",
+          name: { he: "SE", en: "SE" },
+          blurb: { he: "מתלים ספורטיביים, גלגלי 18״ וסופטקס.", en: "Sport-tuned suspension, 18\" wheels and SofTex." },
+          colors: ["ice-cap", "midnight-black", "underground", "ocean-gem", "reservoir-blue", "supersonic-red", "heavy-metal", "dark-cosmos"],
+          interiors: ["black-softex", "boulder-fabric"],
+          distinctExterior: true,
+        },
+        {
+          id: "nightshade",
+          name: { he: "Nightshade", en: "Nightshade" },
+          blurb: { he: "חבילת שחור חיצונית, גלגלי 19״ ופנים שחור בלבד.", en: "Blacked-out exterior, 19\" wheels, black interior only." },
+          colors: ["ice-cap", "midnight-black", "supersonic-red"],
+          interiors: ["black-softex"],
+          distinctExterior: true,
+        },
+        {
+          id: "xle",
+          name: { he: "XLE", en: "XLE" },
+          blurb: { he: "עור ו־Dinamica, מסך 12.3״.", en: "Leather and Dinamica, 12.3\" screen." },
+          colors: ["ice-cap", "midnight-black", "wind-chill", "underground", "ocean-gem", "heavy-metal", "dark-cosmos", "supersonic-red"],
+          interiors: ["light-gray-leather"],
+          distinctExterior: true,
+        },
+        {
+          id: "xse",
+          name: { he: "XSE", en: "XSE" },
+          blurb: { he: "גלגלי 19״ ופנים Cockpit Red או שחור מחורר.", en: "19\" wheels and Cockpit Red or black perforated leather." },
+          colors: ["midnight-black", "wind-chill", "heavy-metal", "ocean-gem", "dark-cosmos", "supersonic-red", "reservoir-blue"],
+          interiors: ["cockpit-red"],
+          distinctExterior: true,
+        },
       ],
       specs: [
         { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "היברידית · FWD / AWD", en: "Hybrid · FWD / AWD" } },
@@ -156,11 +229,48 @@ export const CARS: Car[] = [
       hybrid: true,
       defaultTrim: "limited",
       defaultColor: "storm-cloud",
-      colors: [P.storm, P.cypress],
+      defaultInterior: "black-leather",
+      colors: [P.storm, P.cypress, P.black, P.silver, P.wind, P.ruby, P.metal, P.cement, P.blue],
+      interiors: [I.blackFabric, I.blackSoftex, I.blackLeather, I.ghGrayLeather, I.portobello, I.nightshadeBlack, I.grayUltrasuede, I.platUltra],
       trims: [
-        { id: "xle", name: { he: "XLE", en: "XLE" }, blurb: { he: "שלושה טורים ומסך גדול.", en: "Three rows and a large screen." } },
-        { id: "limited", name: { he: "Limited", en: "Limited" }, blurb: { he: "ציוד עשיר והיבריד.", en: "Loaded hybrid." } },
-        { id: "platinum", name: { he: "Platinum", en: "Platinum" }, blurb: { he: "קצה הפרימיום.", en: "Top of the range." } },
+        {
+          id: "le",
+          name: { he: "LE", en: "LE" },
+          blurb: { he: "שלושה טורים עם בד שחור.", en: "Three rows with black fabric." },
+          colors: ["storm-cloud", "cypress", "midnight-black", "celestial-silver", "wind-chill", "heavy-metal", "cement", "blueprint"],
+          interiors: ["black-fabric"],
+        },
+        {
+          id: "xle",
+          name: { he: "XLE", en: "XLE" },
+          blurb: { he: "שלושה טורים וסופטקס שחור או אפור.", en: "Three rows and black or gray SofTex." },
+          colors: ["storm-cloud", "cypress", "midnight-black", "celestial-silver", "wind-chill", "heavy-metal", "cement", "blueprint"],
+          interiors: ["black-softex"],
+        },
+        {
+          id: "limited",
+          name: { he: "Limited", en: "Limited" },
+          blurb: { he: "גלגלי 20״ ועור.", en: "20\" wheels and leather." },
+          colors: ["storm-cloud", "cypress", "midnight-black", "celestial-silver", "wind-chill", "ruby-flare", "heavy-metal"],
+          interiors: ["black-leather", "gray-leather"],
+          distinctExterior: true,
+        },
+        {
+          id: "platinum",
+          name: { he: "Platinum", en: "Platinum" },
+          blurb: { he: "קצה הפרימיום, כולל Portobello.", en: "Top of the range, including Portobello." },
+          colors: ["storm-cloud", "midnight-black", "wind-chill", "ruby-flare", "heavy-metal"],
+          interiors: ["portobello-leather", "platinum-ultrasuede", "gray-ultrasuede"],
+          distinctExterior: true,
+        },
+        {
+          id: "hybridnightshade",
+          name: { he: "Nightshade", en: "Nightshade" },
+          blurb: { he: "שחור מבחוץ, עור שחור מבפנים.", en: "Blacked-out exterior, black leather cabin." },
+          colors: ["storm-cloud", "midnight-black", "cement"],
+          interiors: ["nightshade-black"],
+          distinctExterior: true,
+        },
       ],
       specs: [
         { label: { he: "מושבים", en: "Seats" }, value: { he: "7 או 8", en: "7 or 8" } },
@@ -187,11 +297,56 @@ export const CARS: Car[] = [
       hybrid: true,
       defaultTrim: "xse",
       defaultColor: "woodland",
-      colors: [P.wood],
+      defaultInterior: "moonstone-softex",
+      colors: [P.wood, P.ice, P.black, P.cypress, P.blue, P.wind, P.metal, P.cement, P.ruby],
+      interiors: [I.grayFabric, I.graySoftex, I.moonstone, I.blackSoftex, I.blackLeather, I.macadamia],
       trims: [
-        { id: "le", name: { he: "LE", en: "LE" }, blurb: { he: "בסיס משפחתי היברידי.", en: "Hybrid family base." } },
-        { id: "xse", name: { he: "XSE", en: "XSE" }, blurb: { he: "עיצוב ספורטיבי.", en: "Sportier look." } },
-        { id: "woodland", name: { he: "Woodland", en: "Woodland" }, blurb: { he: "גחון מוגן וצמיגי שטח.", en: "Skid plate and all-terrain tires." } },
+        {
+          id: "le",
+          name: { he: "LE", en: "LE" },
+          blurb: { he: "בסיס משפחתי היברידי עם בד אפור.", en: "Hybrid family base with gray fabric." },
+          colors: ["ice-cap", "midnight-black", "cypress", "blueprint", "wind-chill", "heavy-metal", "cement"],
+          interiors: ["gray-fabric"],
+        },
+        {
+          id: "xle",
+          name: { he: "XLE", en: "XLE" },
+          blurb: { he: "סופטקס אפור ונוחות משפחתית.", en: "Gray SofTex and family comfort." },
+          colors: ["ice-cap", "midnight-black", "cypress", "blueprint", "wind-chill", "heavy-metal"],
+          interiors: ["gray-softex"],
+        },
+        {
+          id: "xse",
+          name: { he: "XSE", en: "XSE" },
+          blurb: { he: "עיצוב ספורטיבי וסופטקס Moonstone.", en: "Sportier look and Moonstone SofTex." },
+          colors: ["ice-cap", "midnight-black", "cypress", "blueprint", "wind-chill", "heavy-metal", "ruby-flare"],
+          interiors: ["moonstone-softex"],
+          distinctExterior: true,
+        },
+        {
+          id: "woodland",
+          name: { he: "Woodland", en: "Woodland" },
+          blurb: { he: "גחון מוגן, צמיגי שטח ופנים שחור.", en: "Skid plate, all-terrain tires and black SofTex." },
+          colors: ["woodland", "ice-cap", "midnight-black", "cypress", "cement"],
+          interiors: ["black-softex"],
+          distinctExterior: true,
+        },
+        {
+          id: "limited",
+          name: { he: "Limited", en: "Limited" },
+          blurb: { he: "עור שחור ומסך גדול.", en: "Black leather and the large screen." },
+          colors: ["ice-cap", "midnight-black", "cypress", "blueprint", "wind-chill", "heavy-metal"],
+          interiors: ["black-leather"],
+          distinctExterior: true,
+        },
+        {
+          id: "platinum",
+          name: { he: "Platinum", en: "Platinum" },
+          blurb: { he: "קצה הגימור, עור מקדמיה.", en: "Top trim, Macadamia leather." },
+          colors: ["ice-cap", "midnight-black", "cypress", "blueprint", "wind-chill"],
+          interiors: ["macadamia-leather"],
+          distinctExterior: true,
+        },
       ],
       specs: [
         { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "היברידית · AWD זמין", en: "Hybrid · AWD available" } },
@@ -216,10 +371,25 @@ export const CARS: Car[] = [
     {
       defaultTrim: "trd-pro",
       defaultColor: "wave-maker",
-      colors: [P.wave, P.ice],
+      defaultInterior: "black-softex",
+      colors: [P.wave, P.ice, P.black, P.under, P.heritage, P.everest, P.cutting, P.red, P.wind],
+      interiors: [I.blackFabric, I.blackSoftex, I.cockpit],
       trims: [
-        { id: "sr5", name: { he: "SR5", en: "SR5" }, blurb: { he: "בסיס שטח.", en: "Off-road base." } },
-        { id: "trd-pro", name: { he: "TRD Pro", en: "TRD Pro" }, blurb: { he: "קצה השטח של טויוטה.", en: "Toyota's off-road peak." } },
+        {
+          id: "sr5",
+          name: { he: "SR5", en: "SR5" },
+          blurb: { he: "בסיס שטח עם בד שחור.", en: "Off-road base with black fabric." },
+          colors: ["ice-cap", "midnight-black", "underground", "heritage-blue", "cutting-edge", "supersonic-red", "wind-chill"],
+          interiors: ["black-softex"],
+        },
+        {
+          id: "trd-pro",
+          name: { he: "TRD Pro", en: "TRD Pro" },
+          blurb: { he: "קצה השטח. Wave Maker רק עם פנים שחור.", en: "Toyota's off-road peak. Wave Maker with black interior only." },
+          colors: ["wave-maker", "ice-cap", "midnight-black", "underground", "wind-chill"],
+          interiors: ["black-softex"],
+          distinctExterior: true,
+        },
       ],
       specs: [
         { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "4x4 · i-FORCE / MAX", en: "4x4 · i-FORCE / MAX" } },
@@ -244,12 +414,48 @@ export const CARS: Car[] = [
     {
       hybrid: true,
       plugin: true,
-      defaultTrim: "se",
+      defaultTrim: "xse",
       defaultColor: "midnight-black",
-      colors: [P.black, P.blue, P.metal],
+      defaultInterior: "black-blue-softex",
+      colors: [P.black, P.blue, P.metal, P.ice, P.silver, P.wind, P.wood],
+      interiors: [
+        { id: "black-blue-fabric", name: { he: "בד שחור/כחול", en: "Black/Blue fabric" }, hex: "#1a1e28" },
+        { id: "mineral-softex", name: { he: "סופטקס מינרל", en: "Mineral SofTex" }, hex: "#6b6e66" },
+        { id: "black-blue-softex", name: { he: "סופטקס שחור/כחול", en: "Black/Blue SofTex" }, hex: "#1c222c" },
+        { id: "black-red-ultrasuede", name: { he: "אולטרסוויד שחור/אדום", en: "Black/Red Ultrasuede" }, hex: "#2a1518" },
+      ],
       trims: [
-        { id: "se", name: { he: "SE", en: "SE" }, blurb: { he: "פלאג־אין ספורטיבי.", en: "Sporty plug-in." } },
-        { id: "xse", name: { he: "XSE", en: "XSE" }, blurb: { he: "גימור גבוה יותר.", en: "Higher trim." } },
+        {
+          id: "se",
+          name: { he: "SE", en: "SE" },
+          blurb: { he: "פלאג־אין ספורטיבי עם בד שחור/כחול.", en: "Sporty plug-in with black/blue fabric." },
+          colors: ["midnight-black", "blueprint", "heavy-metal", "ice-cap"],
+          interiors: ["black-blue-fabric"],
+        },
+        {
+          id: "woodland",
+          name: { he: "Woodland", en: "Woodland" },
+          blurb: { he: "שטח קל וסופטקס Mineral.", en: "Light off-road and Mineral SofTex." },
+          colors: ["midnight-black", "heavy-metal", "ice-cap", "woodland", "wind-chill"],
+          interiors: ["mineral-softex"],
+          distinctExterior: true,
+        },
+        {
+          id: "xse",
+          name: { he: "XSE", en: "XSE" },
+          blurb: { he: "גימור גבוה, סופטקס שחור/כחול.", en: "Higher trim, black/blue SofTex." },
+          colors: ["midnight-black", "blueprint", "heavy-metal", "ice-cap", "wind-chill"],
+          interiors: ["black-blue-softex"],
+          distinctExterior: true,
+        },
+        {
+          id: "gr-sport",
+          name: { he: "GR Sport", en: "GR Sport" },
+          blurb: { he: "GR, אולטרסוויד שחור/אדום.", en: "GR, black/red Ultrasuede." },
+          colors: ["midnight-black", "blueprint", "heavy-metal"],
+          interiors: ["black-red-ultrasuede"],
+          distinctExterior: true,
+        },
       ],
       specs: [
         { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "פלאג־אין הייבריד AWD", en: "Plug-in hybrid AWD" } },
@@ -275,10 +481,25 @@ export const CARS: Car[] = [
       hybrid: true,
       defaultTrim: "1958",
       defaultColor: "meteor",
-      colors: [P.meteor, P.trail, P.iceberg],
+      defaultInterior: "black-fabric",
+      colors: [P.meteor, P.trail, P.iceberg, P.ice, P.sand, P.wind, P.under, P.heritage],
+      interiors: [I.blackFabric, I.blackSoftex],
       trims: [
-        { id: "1958", name: { he: "1958", en: "1958" }, blurb: { he: "עיצוב מורשת.", en: "Heritage look." } },
-        { id: "land-cruiser", name: { he: "Land Cruiser", en: "Land Cruiser" }, blurb: { he: "גימור מלא.", en: "Full trim." } },
+        {
+          id: "1958",
+          name: { he: "1958", en: "1958" },
+          blurb: { he: "עיצוב מורשת.", en: "Heritage look." },
+          colors: ["meteor", "trail-dust", "iceberg", "wind-chill"],
+          interiors: ["black-fabric"],
+          distinctExterior: true,
+        },
+        {
+          id: "land-cruiser",
+          name: { he: "Land Cruiser", en: "Land Cruiser" },
+          blurb: { he: "גימור מלא.", en: "Full trim." },
+          colors: ["meteor", "trail-dust", "iceberg", "ice-cap", "wind-chill", "underground", "heritage-blue"],
+          interiors: ["black-softex"],
+        },
       ],
       specs: [
         { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "i-FORCE MAX הייבריד 4x4", en: "i-FORCE MAX hybrid 4x4" } },
@@ -304,10 +525,25 @@ export const CARS: Car[] = [
       hybrid: true,
       defaultTrim: "capstone",
       defaultColor: "supersonic-red",
-      colors: [P.red, P.ice, P.black, P.silver, P.cypress, P.blue, P.magnetic],
+      defaultInterior: "black-leather",
+      colors: [P.red, P.ice, P.black, P.silver, P.cypress, P.blue, P.magnetic, P.wind],
+      interiors: [I.blackSoftex, I.blackLeather, I.ghGrayLeather],
       trims: [
-        { id: "sr5", name: { he: "SR5", en: "SR5" }, blurb: { he: "בסיס משפחתי גדול.", en: "Big family base." } },
-        { id: "capstone", name: { he: "Capstone", en: "Capstone" }, blurb: { he: "פרימיום מלא.", en: "Full premium." } },
+        {
+          id: "sr5",
+          name: { he: "SR5", en: "SR5" },
+          blurb: { he: "בסיס משפחתי גדול.", en: "Big family base." },
+          colors: ["ice-cap", "midnight-black", "celestial-silver", "magnetic-gray", "cypress", "blueprint", "wind-chill"],
+          interiors: ["black-leather"],
+        },
+        {
+          id: "capstone",
+          name: { he: "Capstone", en: "Capstone" },
+          blurb: { he: "פרימיום מלא עם עור.", en: "Full premium with leather." },
+          colors: ["supersonic-red", "ice-cap", "midnight-black", "celestial-silver", "cypress", "blueprint", "wind-chill"],
+          interiors: ["black-leather", "gray-leather"],
+          distinctExterior: true,
+        },
       ],
       specs: [
         { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "i-FORCE MAX", en: "i-FORCE MAX" } },
@@ -334,11 +570,40 @@ export const CARS: Car[] = [
     featured: true,
     defaultTrim: "touring",
     defaultColor: "platinum-white-pearl",
-    colors: [P.hWhite, P.hBlack, P.hRadiant2, P.hSilver, P.hSteel, P.hSonic],
+    defaultInterior: "black-leather",
+    colors: [P.hWhite, P.hBlack, P.hRadiant2, P.hSilver, P.hSteel, P.hSonic, P.hSmoke],
+    interiors: [I.hBlackLeather, I.hGrayLeather],
     trims: [
-      { id: "ex-l", name: { he: "EX-L", en: "EX-L" }, blurb: { he: "משפחתי מצויד.", en: "Well-equipped family." } },
-      { id: "touring", name: { he: "Touring", en: "Touring" }, blurb: { he: "קצה הנוחות.", en: "Comfort peak." } },
-      { id: "elite", name: { he: "Elite", en: "Elite" }, blurb: { he: "גימור מלא.", en: "Fully loaded." } },
+      {
+        id: "ex-l",
+        name: { he: "EX-L", en: "EX-L" },
+        blurb: { he: "משפחתי מצויד, עור שחור או אפור.", en: "Well-equipped family, black or gray leather." },
+        colors: ["crystal-black-pearl", "modern-steel-metallic", "platinum-white-pearl", "solar-silver-metallic", "smoke-blue-pearl", "radiant-red-metallic-ii"],
+        interiors: ["black-leather", "gray-leather"],
+      },
+      {
+        id: "sport-l",
+        name: { he: "Sport-L", en: "Sport-L" },
+        blurb: { he: "גלגלים שחורים ופנים שחור עם תפר אדום.", en: "Black wheels and black leather with red stitch." },
+        colors: ["crystal-black-pearl", "platinum-white-pearl", "radiant-red-metallic-ii", "sonic-grey-pearl"],
+        interiors: ["black-leather"],
+        distinctExterior: true,
+      },
+      {
+        id: "touring",
+        name: { he: "Touring", en: "Touring" },
+        blurb: { he: "קצה הנוחות.", en: "Comfort peak." },
+        colors: ["crystal-black-pearl", "modern-steel-metallic", "platinum-white-pearl", "solar-silver-metallic", "sonic-grey-pearl", "smoke-blue-pearl", "radiant-red-metallic-ii"],
+        interiors: ["black-leather", "gray-leather"],
+      },
+      {
+        id: "elite",
+        name: { he: "Elite", en: "Elite" },
+        blurb: { he: "גימור מלא.", en: "Fully loaded." },
+        colors: ["crystal-black-pearl", "modern-steel-metallic", "platinum-white-pearl", "solar-silver-metallic", "sonic-grey-pearl"],
+        interiors: ["black-leather"],
+        distinctExterior: true,
+      },
     ],
     specs: [
       { label: { he: "מנוע", en: "Engine" }, value: { he: "3.5L V6", en: "3.5L V6" } },
@@ -365,11 +630,32 @@ export const CARS: Car[] = [
     hybrid: true,
     defaultTrim: "sport-hybrid",
     defaultColor: "radiant-red-metallic",
-    colors: [P.hRadiant, P.hWhite, P.hBlack, P.hSilver, P.hGray, P.hCanyon, P.hMeteor, P.hNight],
+    defaultInterior: "black-cloth",
+    colors: [P.hRadiant, P.hWhite, P.hBlack, P.hSilver, P.hGray, P.hCanyon, P.hMeteor, P.hNight, P.hAsh],
+    interiors: [I.blackCloth, I.hBlackLeather, I.hGrayLeather, I.trailBlack],
     trims: [
-      { id: "ex-l", name: { he: "EX-L", en: "EX-L" }, blurb: { he: "נוחות יומיומית.", en: "Everyday comfort." } },
-      { id: "sport-hybrid", name: { he: "Sport Hybrid", en: "Sport Hybrid" }, blurb: { he: "היבריד AWD.", en: "Hybrid AWD." } },
-      { id: "trailsport-hybrid", name: { he: "TrailSport Hybrid", en: "TrailSport Hybrid" }, blurb: { he: "שטח קל עם צמיגי שטח.", en: "Light off-road with A/T tires." } },
+      {
+        id: "ex-l",
+        name: { he: "EX-L", en: "EX-L" },
+        blurb: { he: "נוחות יומיומית ועור.", en: "Everyday comfort and leather." },
+        colors: ["crystal-black-pearl", "meteoroid-grey-metallic", "solar-silver-metallic", "platinum-white-pearl", "radiant-red-metallic", "urban-grey-pearl", "canyon-river-blue-metallic"],
+        interiors: ["black-leather", "gray-leather"],
+      },
+      {
+        id: "sport-hybrid",
+        name: { he: "Sport Hybrid", en: "Sport Hybrid" },
+        blurb: { he: "היבריד AWD עם בד שחור.", en: "Hybrid AWD with black cloth." },
+        colors: ["crystal-black-pearl", "meteoroid-grey-metallic", "solar-silver-metallic", "platinum-white-pearl", "radiant-red-metallic", "urban-grey-pearl", "canyon-river-blue-metallic", "still-night-pearl"],
+        interiors: ["black-cloth"],
+      },
+      {
+        id: "trailsport-hybrid",
+        name: { he: "TrailSport Hybrid", en: "TrailSport Hybrid" },
+        blurb: { he: "שטח קל, Ash Green ופנים TrailSport.", en: "Light off-road, Ash Green and TrailSport cabin." },
+        colors: ["ash-green-metallic", "canyon-river-blue-metallic", "crystal-black-pearl", "platinum-white-pearl", "radiant-red-metallic", "urban-grey-pearl"],
+        interiors: ["trailsport-black"],
+        distinctExterior: true,
+      },
     ],
     specs: [
       { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "היברידית AWD · 204 כ״ס", en: "Hybrid AWD · 204 hp" } },
@@ -396,10 +682,25 @@ export const CARS: Car[] = [
     hybrid: true,
     defaultTrim: "touring-hybrid",
     defaultColor: "radiant-red-metallic",
+    defaultInterior: "black-leather",
     colors: [P.hRadiant, P.hWhite, P.hBlack, P.hSilver, P.hGray, P.hCanyon, P.hMeteor, P.hNight],
+    interiors: [I.hBlackLeather, I.hGrayLeather],
     trims: [
-      { id: "sport-hybrid", name: { he: "Sport Hybrid", en: "Sport Hybrid" }, blurb: { he: "היבריד ספורטיבי.", en: "Sporty hybrid." } },
-      { id: "touring-hybrid", name: { he: "Touring Hybrid", en: "Touring Hybrid" }, blurb: { he: "קצה הגימור.", en: "Top trim." } },
+      {
+        id: "sport-hybrid",
+        name: { he: "Sport Hybrid", en: "Sport Hybrid" },
+        blurb: { he: "היבריד ספורטיבי, עור שחור.", en: "Sporty hybrid, black leather." },
+        colors: ["crystal-black-pearl", "solar-silver-metallic", "meteoroid-grey-metallic", "canyon-river-blue-metallic", "platinum-white-pearl", "urban-grey-pearl", "radiant-red-metallic"],
+        interiors: ["black-leather"],
+      },
+      {
+        id: "touring-hybrid",
+        name: { he: "Touring Hybrid", en: "Touring Hybrid" },
+        blurb: { he: "קצה הגימור, שחור או אפור לפי הצבע.", en: "Top trim, black or gray depending on paint." },
+        colors: ["crystal-black-pearl", "solar-silver-metallic", "meteoroid-grey-metallic", "platinum-white-pearl", "urban-grey-pearl", "radiant-red-metallic", "still-night-pearl"],
+        interiors: ["black-leather", "gray-leather"],
+        distinctExterior: true,
+      },
     ],
     specs: [
       { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "היברידית · 204 כ״ס", en: "Hybrid · 204 hp" } },
@@ -425,11 +726,33 @@ export const CARS: Car[] = [
     seats: 8,
     defaultTrim: "trailsport",
     defaultColor: "ash-green-metallic",
-    colors: [P.hAsh, P.hWhite, P.hBlack, P.hSilver, P.hSteel, P.hSonic, P.hRadiant2],
+    defaultInterior: "black-perforated",
+    colors: [P.hAsh, P.hWhite, P.hBlack, P.hSilver, P.hSteel, P.hSonic, P.hRadiant2, P.hSmoke],
+    interiors: [I.hBlackPerf, I.hBlackLeather, I.trailBlack],
     trims: [
-      { id: "sport", name: { he: "Sport", en: "Sport" }, blurb: { he: "שלושה טורים יומיומי.", en: "Everyday three-row." } },
-      { id: "trailsport", name: { he: "TrailSport", en: "TrailSport" }, blurb: { he: "שטח קל.", en: "Light off-road." } },
-      { id: "elite", name: { he: "Elite", en: "Elite" }, blurb: { he: "קצה הפרימיום.", en: "Premium peak." } },
+      {
+        id: "sport",
+        name: { he: "Sport", en: "Sport" },
+        blurb: { he: "שלושה טורים יומיומי.", en: "Everyday three-row." },
+        colors: ["crystal-black-pearl", "solar-silver-metallic", "platinum-white-pearl", "radiant-red-metallic-ii", "sonic-grey-pearl"],
+        interiors: ["black-perforated"],
+      },
+      {
+        id: "trailsport",
+        name: { he: "TrailSport", en: "TrailSport" },
+        blurb: { he: "שטח קל. Ash Green בלעדי.", en: "Light off-road. Exclusive Ash Green." },
+        colors: ["ash-green-metallic", "smoke-blue-pearl", "crystal-black-pearl", "solar-silver-metallic"],
+        interiors: ["black-perforated"],
+        distinctExterior: true,
+      },
+      {
+        id: "elite",
+        name: { he: "Elite", en: "Elite" },
+        blurb: { he: "קצה הפרימיום, עור מחורר.", en: "Premium peak, perforated leather." },
+        colors: ["crystal-black-pearl", "platinum-white-pearl", "sonic-grey-pearl", "solar-silver-metallic", "modern-steel-metallic"],
+        interiors: ["black-perforated"],
+        distinctExterior: true,
+      },
     ],
     specs: [
       { label: { he: "מנוע", en: "Engine" }, value: { he: "3.5L V6 · 285 כ״ס", en: "3.5L V6 · 285 hp" } },
@@ -456,6 +779,11 @@ export function colorsForTrim(car: Car, trimId: string): Paint[] {
   const trim = car.trims.find((t) => t.id === trimId);
   if (!trim?.colors?.length) return car.colors;
   return car.colors.filter((c) => trim.colors!.includes(c.id));
+}
+export function interiorsForTrim(car: Car, trimId: string): Interior[] {
+  const trim = car.trims.find((t) => t.id === trimId);
+  if (!trim?.interiors?.length) return car.interiors;
+  return car.interiors.filter((c) => trim.interiors!.includes(c.id));
 }
 export function carImage(car: Car) {
   if (car.brand === "honda") {
