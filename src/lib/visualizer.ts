@@ -13,10 +13,10 @@ const COMBOS: Record<string, ToyotaCombo> = {
   "rav4-prime": { frameCount: 18, catalogFrame: 16, fit: 0.64 },
   "land-cruiser": { frameCount: 18, catalogFrame: 16, fit: 0.62 },
   sequoia: { frameCount: 36, catalogFrame: 33, fit: 0.64 },
-  "cr-v": { frameCount: 36, catalogFrame: 6, fit: 1.7 },
-  accord: { frameCount: 36, catalogFrame: 6, fit: 1.7 },
-  pilot: { frameCount: 36, catalogFrame: 1, fit: 1.7 },
-  odyssey: { frameCount: 36, catalogFrame: 6, fit: 1.7 },
+  "cr-v": { frameCount: 36, catalogFrame: 23, fit: 1.7 },
+  accord: { frameCount: 36, catalogFrame: 23, fit: 1.7 },
+  pilot: { frameCount: 36, catalogFrame: 21, fit: 1.7 },
+  odyssey: { frameCount: 36, catalogFrame: 23, fit: 1.7 },
 };
 
 function baseUrl() {
