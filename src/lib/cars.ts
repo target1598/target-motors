@@ -1,4 +1,5 @@
-import { catalogSrc, hondaSrc } from "@/lib/visualizer";
+import { catalogSrc } from "@/lib/visualizer";
+
 
 export type Text = { he: string; en: string };
 export type Paint = { id: string; name: Text; hex: string };
@@ -786,8 +787,6 @@ export function interiorsForTrim(car: Car, trimId: string): Interior[] {
   return car.interiors.filter((c) => trim.interiors!.includes(c.id));
 }
 export function carImage(car: Car) {
-  if (car.brand === "honda") {
-    return hondaSrc(car.slug) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
-  }
   return catalogSrc(car.slug, car.defaultColor) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
 }
+

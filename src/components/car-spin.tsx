@@ -6,9 +6,9 @@ import {
   hondaSrc,
   interiorSrc,
   jellySrc,
-  studioFit,
   toyotaCombo,
 } from "@/lib/visualizer";
+
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +31,8 @@ export function CarSpin({
   const combo = toyotaCombo(slug);
   const interior = mode === "interior" && interiorId;
   const total = interior ? 1 : frameCount(slug);
-  const fit = interior ? 1 : stillSrc ? 0.92 : studioFit(slug);
+  const fit = 1;
+
   const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
   const [expanded, setExpanded] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
