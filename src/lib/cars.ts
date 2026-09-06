@@ -351,38 +351,6 @@ export const CARS: Car[] = [
     ],
   },
   {
-    slug: "civic",
-    brand: "honda",
-    year: 2026,
-    name: { he: "הונדה סיוויק הייבריד", en: "Honda Civic Hybrid" },
-    tagline: { he: "סדאן היברידית חדה וחסכונית", en: "A sharp, efficient hybrid sedan" },
-    description: {
-      he: "סיוויק 2026 מארה״ב — הייבריד 200 כ״ס בגימורי Sport, Honda Sensing, ועיצוב עדכני.",
-      en: "2026 US Civic — 200-hp hybrid on Sport trims, Honda Sensing, current design.",
-    },
-    body: "sedan",
-    seats: 5,
-    hybrid: true,
-    featured: true,
-    defaultTrim: "sport-hybrid",
-    defaultColor: "rallye-red",
-    colors: [P.hRed, P.hWhite, P.hBlack, P.hGray, P.hSilver, P.hBlue],
-    trims: [
-      { id: "lx", name: { he: "LX", en: "LX" }, blurb: { he: "בסיס סדאן.", en: "Sedan base." } },
-      { id: "sport-hybrid", name: { he: "Sport Hybrid", en: "Sport Hybrid" }, blurb: { he: "היבריד 200 כ״ס.", en: "200-hp hybrid." } },
-      { id: "sport-touring-hybrid", name: { he: "Sport Touring Hybrid", en: "Sport Touring Hybrid" }, blurb: { he: "קצה הגימור ההיברידי.", en: "Top hybrid trim." } },
-    ],
-    specs: [
-      { label: { he: "הנעה", en: "Drivetrain" }, value: { he: "היברידית · 200 כ״ס", en: "Hybrid · 200 hp" } },
-      { label: { he: "מושבים", en: "Seats" }, value: { he: "5", en: "5" } },
-      { label: { he: "בטיחות", en: "Safety" }, value: { he: "Honda Sensing", en: "Honda Sensing" } },
-    ],
-    highlights: [
-      { he: "היברידית 200 כ״ס", en: "200-hp hybrid" },
-      { he: "Honda Sensing", en: "Honda Sensing" },
-    ],
-  },
-  {
     slug: "cr-v",
     brand: "honda",
     year: 2026,
@@ -490,5 +458,8 @@ export function colorsForTrim(car: Car, trimId: string): Paint[] {
   return car.colors.filter((c) => trim.colors!.includes(c.id));
 }
 export function carImage(car: Car) {
-  return catalogSrc(car.slug, car.defaultColor) || hondaSrc(car.slug) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
+  if (car.brand === "honda") {
+    return hondaSrc(car.slug) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
+  }
+  return catalogSrc(car.slug, car.defaultColor) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
 }

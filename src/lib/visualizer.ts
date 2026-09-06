@@ -13,11 +13,10 @@ const COMBOS: Record<string, ToyotaCombo> = {
   "rav4-prime": { frameCount: 18, catalogFrame: 16, fit: 0.64 },
   "land-cruiser": { frameCount: 18, catalogFrame: 16, fit: 0.62 },
   sequoia: { frameCount: 36, catalogFrame: 33, fit: 0.64 },
-  civic: { frameCount: 36, catalogFrame: 1, fit: 0.5 },
-  "cr-v": { frameCount: 36, catalogFrame: 5, fit: 1 },
-  accord: { frameCount: 36, catalogFrame: 5, fit: 1 },
+  "cr-v": { frameCount: 36, catalogFrame: 6, fit: 1 },
+  accord: { frameCount: 36, catalogFrame: 6, fit: 1 },
   pilot: { frameCount: 36, catalogFrame: 1, fit: 1 },
-  odyssey: { frameCount: 36, catalogFrame: 5, fit: 1 },
+  odyssey: { frameCount: 36, catalogFrame: 6, fit: 1 },
 };
 
 function baseUrl() {
@@ -35,9 +34,11 @@ export function studioFit(slug: string) {
 
 /** Listing tiles: a notch larger than the 360 studio, same 3/4 hero angle. */
 export function cardFit(slug: string) {
-  const fit = studioFit(slug);
-  if (fit >= 0.95) return 1.16;
-  return Math.min(0.88, fit + 0.18);
+  const combo = toyotaCombo(slug);
+  if (!combo) return 1;
+  // Honda listing tiles use catalog stills — fill the card.
+  if (combo.fit >= 0.95) return 1.2;
+  return Math.min(0.88, combo.fit + 0.18);
 }
 
 export function jellySrc(slug: string, paintId: string, frame: number) {
