@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-Cltr0gcK.js";import{t}from"./car-detail-BS7yOjyq.js";import{n}from"./index-DXr4I2c4.js";var r=e();function i(){let e=n.useLoaderData();return(0,r.jsx)(t,{car:e})}export{i as component};
