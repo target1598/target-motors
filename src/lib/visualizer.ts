@@ -36,7 +36,8 @@ export function studioFit(slug: string) {
 export function cardFit(slug: string) {
   const combo = toyotaCombo(slug);
   if (!combo) return 1;
-  if (combo.fit >= 1) return Math.min(2.08, combo.fit + 0.18);
+  // Honda listing stills are already tight-cropped like Toyota jellies.
+  if (combo.fit >= 1) return 0.82;
   return Math.min(0.88, combo.fit + 0.18);
 }
 
