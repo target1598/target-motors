@@ -16,9 +16,10 @@ Then TRIM_SPINS in src/lib/assets.generated.ts is rewritten.
 from __future__ import annotations
 
 import re
-import shutil
 import sys
 from pathlib import Path
+
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src/lib/assets.generated.ts"
@@ -68,8 +69,10 @@ def install_combo(src_dir: Path, trim_id: str, paint_id: str) -> bool:
         for old in dest.glob("*"):
             if old.suffix.lower() in {".png", ".webp", ".jpg"}:
                 old.unlink()
-        for i, (_, src) in enumerate(frames, 1):
-            shutil.copy2(src, dest / f"{i}.png")
+    for i, (_, src) in enumerate(frames, 1):
+        im = Image.open(src).convert("RGBA")
+        for dest in dests:
+            im.save(dest / f"{i}.png", "PNG")
     print(f"  {trim_id}/{paint_id}  ({frames[0][1].name} … {frames[-1][1].name})")
     return True
 

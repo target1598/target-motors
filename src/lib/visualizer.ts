@@ -112,11 +112,11 @@ export function trimStillSrc(slug: string, trimId: string, paintId: string) {
   return `${baseUrl()}jellies/${slug}/trims/${trimId}/${paintId}.webp`;
 }
 
-/** Camry is folder-driven: only show a color when that trim actually has a 360 or a still. */
+/** Camry is folder-driven: only a colour with a 360 for that trim is offered. */
 export function colorHasVisual(slug: string, trimId: string, paintId: string) {
   if (hasTrimSpin(slug, trimId, paintId)) return true;
-  if (hasTrimStill(slug, trimId, paintId)) return true;
   if (slug === "camry") return false;
+  if (hasTrimStill(slug, trimId, paintId)) return true;
   return paintHasSpin(slug, paintId);
 }
 

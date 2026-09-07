@@ -2,7 +2,7 @@
 export const SPIN_PAINTS: Record<string, string[]> = {
   "4runner": ["ice-cap", "wave-maker"],
   "accord": ["canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
-  "camry": ["ice-cap", "supersonic-red", "wind-chill"],
+  "camry": [],
   "cr-v": ["canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
   "grand-highlander": ["cypress", "storm-cloud"],
   "land-cruiser": ["iceberg", "meteor", "trail-dust"],
@@ -14,7 +14,36 @@ export const SPIN_PAINTS: Record<string, string[]> = {
 };
 
 export const TRIM_SPINS: string[] = [
-  "camry/se/wind-chill",
+  "camry/nightshade/ice-cap",
+  "camry/nightshade/midnight-black",
+  "camry/nightshade/supersonic-red",
+  "camry/se-upgrade-awd/heavy-metal",
+  "camry/se-upgrade-awd/ice-cap",
+  "camry/se-upgrade-awd/midnight-black",
+  "camry/se-upgrade-awd/supersonic-red",
+  "camry/se-upgrade-awd/underground",
+  "camry/se-upgrade/heavy-metal",
+  "camry/se-upgrade/ice-cap",
+  "camry/se-upgrade/midnight-black",
+  "camry/se-upgrade/supersonic-red",
+  "camry/se-upgrade/underground",
+  "camry/se/ice-cap",
+  "camry/se/midnight-black",
+  "camry/se/supersonic-red",
+  "camry/se/underground",
+  "camry/xle/dark-cosmos",
+  "camry/xle/heavy-metal",
+  "camry/xle/midnight-black",
+  "camry/xle/ocean-gem",
+  "camry/xle/wind-chill",
+  "camry/xse/heavy-metal",
+  "camry/xse/heavy-metal-black-roof",
+  "camry/xse/midnight-black",
+  "camry/xse/ocean-gem-black-roof",
+  "camry/xse/supersonic-red",
+  "camry/xse/underground",
+  "camry/xse/wind-chill",
+  "camry/xse/wind-chill-black-roof",
 ];
 
 export const TRIM_STILLS: string[] = [

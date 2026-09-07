@@ -164,7 +164,7 @@ export const CARS: Car[] = [
     {
       hybrid: true,
       defaultTrim: "se",
-      defaultColor: "wind-chill",
+      defaultColor: "ice-cap",
       defaultInterior: "black-softex",
       colors: [
         P.white,
@@ -185,7 +185,7 @@ export const CARS: Car[] = [
           id: "se",
           name: { he: "SE FWD", en: "SE FWD" },
           blurb: { he: "מתלים ספורטיביים, גלגלי 18״ וסופטקס.", en: "Sport-tuned suspension, 18\" wheels and SofTex." },
-          colors: ["ice-cap", "midnight-black", "supersonic-red", "underground", "wind-chill"],
+          colors: ["ice-cap", "midnight-black", "supersonic-red", "underground"],
           interiors: ["black-softex", "boulder-fabric"],
           distinctExterior: true,
         },
