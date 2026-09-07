@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   frameAngle,
@@ -48,21 +48,20 @@ export function CarSpin({
   }, [combo, interior, paintId, slug, stillSrc, total]);
 
   useEffect(() => {
-    if (!urls.length || pngTurntable) return;
+    if (!urls.length) return;
     urls.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
-  }, [pngTurntable, urls]);
+  }, [urls]);
 
   useEffect(() => {
     if (interior) {
       setFrame(1);
       return;
     }
-    if (!combo) return;
-    setFrame(combo.catalogFrame);
-  }, [combo, interior, interiorId, paintId]);
+    setFrame(combo?.catalogFrame ?? 1);
+  }, [interior, interiorId, paintId, slug, combo?.catalogFrame]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -101,8 +100,8 @@ export function CarSpin({
     drag.current.x = e.clientX;
     drag.current.leftover += -dx;
     const width = stageRef.current?.clientWidth ?? 800;
-    // One drag across the viewer = one full rotation (Toyota / SpriteSpin).
-    const tick = Math.max(18, Math.round(width / total));
+    // Short swipe still turns the car; a full-width drag is a bit over one rotation.
+    const tick = Math.max(10, Math.round(width / (total * 3)));
     const steps = Math.trunc(drag.current.leftover / tick);
     if (!steps) return;
     drag.current.leftover -= steps * tick;
@@ -153,8 +152,6 @@ export function CarSpin({
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
             style={{ width: `${fit * 100}%`, height: `${fit * 100}%` }}
           />
-        ) : pngTurntable ? (
-          <PngTurntable urls={urls} frame={frame} alt={alt} />
         ) : (
           urls.map((src, i) => (
             <img
@@ -186,7 +183,7 @@ export function CarSpin({
 
         {angle != null ? (
           <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 text-xs tracking-wide text-neutral-500 sm:bottom-6">
-            {Number.isInteger(angle) ? `${angle}°` : `${angle}°`}
+            {`${angle}°`}
           </div>
         ) : null}
 
@@ -213,105 +210,6 @@ export function CarSpin({
       ) : null}
       {expanded && typeof document !== "undefined" ? createPortal(stage, document.body) : stage}
     </>
-  );
-}
-
-/**
- * Toyota-style jelly turntable: original PNG frames (with alpha + factory
- * shadow) are drawn onto a white canvas. Dragging swaps frames. Nothing is
- * fetched from Toyota — these are the local files.
- */
-function PngTurntable({ urls, frame, alt }: { urls: string[]; frame: number; alt: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imagesRef = useRef<HTMLImageElement[]>([]);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    const images = urls.map((src) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.src = src;
-      return img;
-    });
-    imagesRef.current = images;
-    Promise.all(
-      images.map(
-        (img) =>
-          img.decode?.().catch(() => undefined) ??
-          new Promise<void>((resolve) => {
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-          }),
-      ),
-    ).then(() => {
-      if (!cancelled) setReady(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [urls]);
-
-  const paint = useCallback(() => {
-    const canvas = canvasRef.current;
-    const parent = canvas?.parentElement;
-    if (!canvas || !parent) return;
-    const img = imagesRef.current[frame - 1];
-    if (!img || !img.naturalWidth) return;
-    const w = parent.clientWidth;
-    const h = parent.clientHeight;
-    if (w < 2 || h < 2) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, w, h);
-    const ir = img.naturalWidth / img.naturalHeight;
-    const cr = w / h;
-    let dw: number;
-    let dh: number;
-    let dx: number;
-    let dy: number;
-    if (ir > cr) {
-      dw = w;
-      dh = w / ir;
-      dx = 0;
-      dy = (h - dh) / 2;
-    } else {
-      dh = h;
-      dw = h * ir;
-      dy = 0;
-      dx = (w - dw) / 2;
-    }
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(img, dx, dy, dw, dh);
-  }, [frame, ready]);
-
-  useEffect(() => {
-    paint();
-  }, [paint]);
-
-  useEffect(() => {
-    const parent = canvasRef.current?.parentElement;
-    if (!parent) return;
-    const ro = new ResizeObserver(() => paint());
-    ro.observe(parent);
-    return () => ro.disconnect();
-  }, [paint]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 h-full w-full"
-      role="img"
-      aria-label={alt}
-    />
   );
 }
 

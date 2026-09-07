@@ -30,6 +30,15 @@ const COMBOS: Record<string, ToyotaCombo> = {
 /** Official Toyota 16-view jelly, 22.5° steps, starting at front (0°). */
 const CAMRY_WIND_CHILL_ANGLES = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5];
 
+const CAMRY_WIND_CHILL: ToyotaCombo = {
+  frameCount: 16,
+  catalogFrame: 3,
+  fit: 1,
+  ext: "png",
+  aspect: "1090/482",
+  angles: CAMRY_WIND_CHILL_ANGLES,
+};
+
 const SPIN_PAINTS: Record<string, Set<string>> = Object.fromEntries(
   Object.entries(SPIN_MAP).map(([slug, paints]) => [slug, new Set(paints)]),
 );
@@ -47,16 +56,7 @@ function baseUrl() {
 }
 
 export function toyotaCombo(slug: string, paintId?: string): ToyotaCombo | null {
-  if (slug === "camry" && paintId === "wind-chill") {
-    return {
-      frameCount: 16,
-      catalogFrame: 3,
-      fit: 1,
-      ext: "png",
-      aspect: "1090/482",
-      angles: CAMRY_WIND_CHILL_ANGLES,
-    };
-  }
+  if (slug === "camry" && paintId === "wind-chill") return CAMRY_WIND_CHILL;
   return COMBOS[slug] ?? null;
 }
 
