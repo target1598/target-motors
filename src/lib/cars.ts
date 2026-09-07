@@ -159,9 +159,9 @@ export const CARS: Car[] = [
     5,
     {
       hybrid: true,
-      defaultTrim: "xse",
-      defaultColor: "supersonic-red",
-      defaultInterior: "cockpit-red",
+      defaultTrim: "se",
+      defaultColor: "wind-chill",
+      defaultInterior: "black-softex",
       colors: [P.red, P.ice, P.black, P.wind, P.silver, P.under, P.metal, P.ocean, P.reservoir, P.cosmos],
       interiors: [I.boulder, I.blackSoftex, I.grayLeather, I.cockpit],
       trims: [
@@ -176,7 +176,7 @@ export const CARS: Car[] = [
           id: "se",
           name: { he: "SE", en: "SE" },
           blurb: { he: "מתלים ספורטיביים, גלגלי 18״ וסופטקס.", en: "Sport-tuned suspension, 18\" wheels and SofTex." },
-          colors: ["ice-cap", "midnight-black", "underground", "ocean-gem", "reservoir-blue", "supersonic-red", "heavy-metal", "dark-cosmos"],
+          colors: ["wind-chill", "ice-cap", "midnight-black", "underground", "ocean-gem", "reservoir-blue", "supersonic-red", "heavy-metal", "dark-cosmos"],
           interiors: ["black-softex", "boulder-fabric"],
           distinctExterior: true,
         },

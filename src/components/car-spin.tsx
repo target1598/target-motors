@@ -28,9 +28,9 @@ export function CarSpin({
   stillSrc?: string | null;
 }) {
   const { t } = useLanguage();
-  const combo = toyotaCombo(slug);
+  const combo = toyotaCombo(slug, paintId);
   const interior = mode === "interior" && interiorId;
-  const total = interior ? 1 : frameCount(slug);
+  const total = interior ? 1 : frameCount(slug, paintId);
   const fit = 1;
 
   const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
@@ -58,8 +58,8 @@ export function CarSpin({
       return;
     }
     if (!combo) return;
-    setFrame((f) => Math.min(Math.max(1, f), total));
-  }, [combo, interior, interiorId, total]);
+    setFrame(combo.catalogFrame);
+  }, [combo, interior, interiorId, paintId]);
 
   useEffect(() => {
     if (!expanded) return;

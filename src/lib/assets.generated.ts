@@ -2,7 +2,7 @@
 export const SPIN_PAINTS: Record<string, string[]> = {
   "4runner": ["ice-cap", "wave-maker"],
   "accord": ["canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
-  "camry": ["ice-cap", "supersonic-red"],
+  "camry": ["ice-cap", "supersonic-red", "wind-chill"],
   "cr-v": ["canyon-river-blue-metallic", "crystal-black-pearl", "meteoroid-grey-metallic", "platinum-white-pearl", "radiant-red-metallic", "solar-silver-metallic", "still-night-pearl", "urban-grey-pearl"],
   "grand-highlander": ["cypress", "storm-cloud"],
   "land-cruiser": ["iceberg", "meteor", "trail-dust"],
@@ -36,7 +36,6 @@ export const TRIM_STILLS: string[] = [
   "camry/se/magnetic-gray",
   "camry/se/midnight-black",
   "camry/se/underground",
-  "camry/se/wind-chill",
   "camry/xle/celestial-silver",
   "camry/xle/heavy-metal",
   "camry/xle/ice-cap",

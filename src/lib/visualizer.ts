@@ -38,7 +38,10 @@ function baseUrl() {
   return base.endsWith("/") ? base : `${base}/`;
 }
 
-export function toyotaCombo(slug: string): ToyotaCombo | null {
+export function toyotaCombo(slug: string, paintId?: string): ToyotaCombo | null {
+  if (slug === "camry" && paintId === "wind-chill") {
+    return { frameCount: 16, catalogFrame: 3, fit: 1 };
+  }
   return COMBOS[slug] ?? null;
 }
 
@@ -57,7 +60,7 @@ export function jellySrc(slug: string, paintId: string, frame: number) {
 }
 
 export function catalogSrc(slug: string, paintId: string) {
-  const combo = toyotaCombo(slug);
+  const combo = toyotaCombo(slug, paintId);
   if (!combo) return "";
   return jellySrc(slug, paintId, combo.catalogFrame);
 }
@@ -66,8 +69,8 @@ export function hondaSrc(slug: string) {
   return `${baseUrl()}cars/honda/${slug}.webp`;
 }
 
-export function frameCount(slug: string) {
-  return toyotaCombo(slug)?.frameCount ?? 36;
+export function frameCount(slug: string, paintId?: string) {
+  return toyotaCombo(slug, paintId)?.frameCount ?? 36;
 }
 
 export function paintHasSpin(slug: string, paintId: string) {
