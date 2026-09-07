@@ -112,10 +112,18 @@ export function trimStillSrc(slug: string, trimId: string, paintId: string) {
   return `${baseUrl()}jellies/${slug}/trims/${trimId}/${paintId}.webp`;
 }
 
-/** Camry is folder-driven: only a colour with a 360 for that trim is offered. */
+export function isFolderSpin(slug: string) {
+  const prefix = `${slug}/`;
+  for (const key of TRIM_SPINS) {
+    if (key.startsWith(prefix)) return true;
+  }
+  return false;
+}
+
+/** Folder-driven models only offer a colour when that trim has a 360. */
 export function colorHasVisual(slug: string, trimId: string, paintId: string) {
   if (hasTrimSpin(slug, trimId, paintId)) return true;
-  if (slug === "camry") return false;
+  if (isFolderSpin(slug)) return false;
   if (hasTrimStill(slug, trimId, paintId)) return true;
   return paintHasSpin(slug, paintId);
 }

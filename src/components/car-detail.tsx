@@ -17,7 +17,7 @@ import {
 } from "@/lib/cars";
 import { whatsappHref } from "@/lib/company";
 import { useLanguage } from "@/lib/language";
-import { catalogSrc, colorHasVisual, hasInterior, hasTrimSpin, hasTrimStill, interiorSrc, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
+import { catalogSrc, colorHasVisual, hasInterior, hasTrimSpin, hasTrimStill, interiorSrc, isFolderSpin, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
 
 export function CarDetail({ car }: { car: Car }) {
   const { lang, t, dir } = useLanguage();
@@ -57,7 +57,7 @@ export function CarDetail({ car }: { car: Car }) {
 
   const spin =
     hasTrimSpin(car.slug, trim.id, color.id) ||
-    (paintHasSpin(car.slug, color.id) && !hasTrimStill(car.slug, trim.id, color.id) && car.slug !== "camry");
+    (!isFolderSpin(car.slug) && paintHasSpin(car.slug, color.id) && !hasTrimStill(car.slug, trim.id, color.id));
   const exteriorStill = hasTrimSpin(car.slug, trim.id, color.id)
     ? null
     : hasTrimStill(car.slug, trim.id, color.id)
@@ -149,7 +149,7 @@ export function CarDetail({ car }: { car: Car }) {
           {visibleTrims.length > 1 ? (
             <div className="mt-8">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-quiet">{t.car.trim}</p>
-              <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {visibleTrims.map((item) => (
                   <button
                     key={item.id}
@@ -185,7 +185,9 @@ export function CarDetail({ car }: { car: Car }) {
                       style={{
                         background: item.id.endsWith("black-roof")
                           ? `linear-gradient(180deg, #1a1a1a 38%, ${item.hex} 38%)`
-                          : item.hex,
+                          : item.id.endsWith("grey-roof")
+                            ? `linear-gradient(180deg, #c9c9c6 38%, ${item.hex} 38%)`
+                            : item.hex,
                       }}
                     />
                     <span className={`text-center text-[10px] leading-tight ${item.id === color.id ? "text-ink" : "text-quiet"}`}>
