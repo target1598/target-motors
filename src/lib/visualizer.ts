@@ -77,9 +77,9 @@ export function hasTrimSpin(slug: string, trimId: string, paintId: string) {
 }
 
 export function toyotaCombo(slug: string, paintId?: string, trimId?: string): ToyotaCombo | null {
-  if (slug === "camry" && trimId === "xse" && paintId === "wind-chill-black-roof") return CAMRY_SHOWROOM;
+  if (slug === "camry" && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_SHOWROOM;
   if (slug && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_PNG_16;
-  if (slug === "camry" && paintId === "wind-chill") return CAMRY_PNG_16;
+  if (slug === "camry" && paintId === "wind-chill") return CAMRY_SHOWROOM;
   return COMBOS[slug] ?? null;
 }
 

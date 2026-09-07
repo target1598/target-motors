@@ -212,7 +212,12 @@ export function CarSpin({
         ) : null}
 
         {angle != null ? (
-          <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 text-xs tracking-wide text-neutral-500 sm:bottom-6">
+          <div
+            className={cn(
+              "pointer-events-none absolute left-1/2 z-10 -translate-x-1/2 text-[11px] tracking-[0.22em]",
+              showroom ? "bottom-[16%] text-ink/45" : "bottom-4 text-neutral-500 sm:bottom-6",
+            )}
+          >
             {`${angle}°`}
           </div>
         ) : null}
