@@ -5,6 +5,12 @@ export type ToyotaCombo = {
   catalogFrame: number;
   /** How much of the studio the asset should fill. Tight crops need a smaller number. */
   fit: number;
+  /** Frame file extension. Toyota jellies are PNG; older spins are webp. */
+  ext?: "png" | "webp";
+  /** CSS aspect-ratio matching the source frames, e.g. "1090/482". */
+  aspect?: string;
+  /** Degrees for each frame index (1-based). */
+  angles?: number[];
 };
 
 const COMBOS: Record<string, ToyotaCombo> = {
@@ -21,6 +27,8 @@ const COMBOS: Record<string, ToyotaCombo> = {
   odyssey: { frameCount: 36, catalogFrame: 23, fit: 1 },
 };
 
+/** Official Toyota 16-view jelly, 22.5° steps, starting at front (0°). */
+const CAMRY_WIND_CHILL_ANGLES = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5];
 
 const SPIN_PAINTS: Record<string, Set<string>> = Object.fromEntries(
   Object.entries(SPIN_MAP).map(([slug, paints]) => [slug, new Set(paints)]),
@@ -40,7 +48,14 @@ function baseUrl() {
 
 export function toyotaCombo(slug: string, paintId?: string): ToyotaCombo | null {
   if (slug === "camry" && paintId === "wind-chill") {
-    return { frameCount: 16, catalogFrame: 3, fit: 1 };
+    return {
+      frameCount: 16,
+      catalogFrame: 3,
+      fit: 1,
+      ext: "png",
+      aspect: "1090/482",
+      angles: CAMRY_WIND_CHILL_ANGLES,
+    };
   }
   return COMBOS[slug] ?? null;
 }
@@ -54,9 +69,9 @@ export function cardFit(slug: string) {
   return 0.9;
 }
 
-
 export function jellySrc(slug: string, paintId: string, frame: number) {
-  return `${baseUrl()}jellies/${slug}/${paintId}/${frame}.webp`;
+  const ext = toyotaCombo(slug, paintId)?.ext ?? "webp";
+  return `${baseUrl()}jellies/${slug}/${paintId}/${frame}.${ext}`;
 }
 
 export function catalogSrc(slug: string, paintId: string) {
@@ -95,4 +110,10 @@ export function interiorHasSpin(slug: string, interiorId: string) {
 
 export function interiorSrc(slug: string, interiorId: string, frame: number) {
   return `${baseUrl()}interiors/${slug}/${interiorId}/${frame}.webp`;
+}
+
+export function frameAngle(slug: string, paintId: string, frame: number) {
+  const angles = toyotaCombo(slug, paintId)?.angles;
+  if (!angles?.length) return null;
+  return angles[frame - 1] ?? null;
 }
