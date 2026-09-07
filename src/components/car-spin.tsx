@@ -20,6 +20,7 @@ export function CarSpin({
   mode = "exterior",
   interiorId,
   stillSrc,
+  trimId,
 }: {
   slug: string;
   paintId: string;
@@ -27,11 +28,12 @@ export function CarSpin({
   mode?: "exterior" | "interior";
   interiorId?: string;
   stillSrc?: string | null;
+  trimId?: string;
 }) {
   const { t } = useLanguage();
-  const combo = toyotaCombo(slug, paintId);
+  const combo = toyotaCombo(slug, paintId, trimId);
   const interior = mode === "interior" && interiorId;
-  const total = interior ? 1 : frameCount(slug, paintId);
+  const total = interior ? 1 : frameCount(slug, paintId, trimId);
   const fit = 1;
   const pngTurntable = combo?.ext === "png";
 
@@ -44,8 +46,8 @@ export function CarSpin({
   const urls = useMemo(() => {
     if (stillSrc || interior) return [] as string[];
     if (!combo) return [] as string[];
-    return Array.from({ length: total }, (_, i) => jellySrc(slug, paintId, i + 1));
-  }, [combo, interior, paintId, slug, stillSrc, total]);
+    return Array.from({ length: total }, (_, i) => jellySrc(slug, paintId, i + 1, trimId));
+  }, [combo, interior, paintId, slug, stillSrc, total, trimId]);
 
   useEffect(() => {
     if (!urls.length) return;
@@ -61,7 +63,7 @@ export function CarSpin({
       return;
     }
     setFrame(combo?.catalogFrame ?? 1);
-  }, [interior, interiorId, paintId, slug, combo?.catalogFrame]);
+  }, [interior, interiorId, paintId, slug, trimId, combo?.catalogFrame]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -84,7 +86,7 @@ export function CarSpin({
   }
 
   const canSpin = urls.length > 1;
-  const angle = frameAngle(slug, paintId, frame);
+  const angle = frameAngle(slug, paintId, frame, trimId);
 
   function onPointerDown(e: React.PointerEvent) {
     if (!canSpin) return;

@@ -1,4 +1,4 @@
-import { INTERIORS as INTERIOR_MAP, INTERIOR_SPINS, SPIN_PAINTS as SPIN_MAP, TRIM_STILLS as TRIM_LIST } from "@/lib/assets.generated";
+import { INTERIORS as INTERIOR_MAP, INTERIOR_SPINS, SPIN_PAINTS as SPIN_MAP, TRIM_SPINS as TRIM_SPIN_LIST, TRIM_STILLS as TRIM_LIST } from "@/lib/assets.generated";
 
 export type ToyotaCombo = {
   frameCount: number;
@@ -27,22 +27,22 @@ const COMBOS: Record<string, ToyotaCombo> = {
   odyssey: { frameCount: 36, catalogFrame: 23, fit: 1 },
 };
 
-/** Official Toyota 16-view jelly, 22.5° steps, starting at front (0°). */
-const CAMRY_WIND_CHILL_ANGLES = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5];
-
-const CAMRY_WIND_CHILL: ToyotaCombo = {
+/** Official Toyota 16-view jelly, 22.5° steps, starting at front (0°). Stable identity. */
+const CAMRY_PNG_ANGLES = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5];
+const CAMRY_PNG_16: ToyotaCombo = {
   frameCount: 16,
   catalogFrame: 3,
   fit: 1,
   ext: "png",
   aspect: "1090/482",
-  angles: CAMRY_WIND_CHILL_ANGLES,
+  angles: CAMRY_PNG_ANGLES,
 };
 
 const SPIN_PAINTS: Record<string, Set<string>> = Object.fromEntries(
   Object.entries(SPIN_MAP).map(([slug, paints]) => [slug, new Set(paints)]),
 );
 const TRIM_STILLS = new Set(TRIM_LIST);
+const TRIM_SPINS = new Set(TRIM_SPIN_LIST);
 const INTERIORS: Record<string, Set<string>> = Object.fromEntries(
   Object.entries(INTERIOR_MAP).map(([slug, ids]) => [slug, new Set(ids)]),
 );
@@ -55,8 +55,17 @@ function baseUrl() {
   return base.endsWith("/") ? base : `${base}/`;
 }
 
-export function toyotaCombo(slug: string, paintId?: string): ToyotaCombo | null {
-  if (slug === "camry" && paintId === "wind-chill") return CAMRY_WIND_CHILL;
+function trimSpinKey(slug: string, trimId: string, paintId: string) {
+  return `${slug}/${trimId}/${paintId}`;
+}
+
+export function hasTrimSpin(slug: string, trimId: string, paintId: string) {
+  return TRIM_SPINS.has(trimSpinKey(slug, trimId, paintId));
+}
+
+export function toyotaCombo(slug: string, paintId?: string, trimId?: string): ToyotaCombo | null {
+  if (slug && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_PNG_16;
+  if (slug === "camry" && paintId === "wind-chill") return CAMRY_PNG_16;
   return COMBOS[slug] ?? null;
 }
 
@@ -69,23 +78,26 @@ export function cardFit(slug: string) {
   return 0.9;
 }
 
-export function jellySrc(slug: string, paintId: string, frame: number) {
-  const ext = toyotaCombo(slug, paintId)?.ext ?? "webp";
+export function jellySrc(slug: string, paintId: string, frame: number, trimId?: string) {
+  if (trimId && hasTrimSpin(slug, trimId, paintId)) {
+    return `${baseUrl()}jellies/${slug}/${trimId}/${paintId}/${frame}.png`;
+  }
+  const ext = toyotaCombo(slug, paintId, trimId)?.ext ?? "webp";
   return `${baseUrl()}jellies/${slug}/${paintId}/${frame}.${ext}`;
 }
 
-export function catalogSrc(slug: string, paintId: string) {
-  const combo = toyotaCombo(slug, paintId);
+export function catalogSrc(slug: string, paintId: string, trimId?: string) {
+  const combo = toyotaCombo(slug, paintId, trimId);
   if (!combo) return "";
-  return jellySrc(slug, paintId, combo.catalogFrame);
+  return jellySrc(slug, paintId, combo.catalogFrame, trimId);
 }
 
 export function hondaSrc(slug: string) {
   return `${baseUrl()}cars/honda/${slug}.webp`;
 }
 
-export function frameCount(slug: string, paintId?: string) {
-  return toyotaCombo(slug, paintId)?.frameCount ?? 36;
+export function frameCount(slug: string, paintId?: string, trimId?: string) {
+  return toyotaCombo(slug, paintId, trimId)?.frameCount ?? 36;
 }
 
 export function paintHasSpin(slug: string, paintId: string) {
@@ -100,6 +112,14 @@ export function trimStillSrc(slug: string, trimId: string, paintId: string) {
   return `${baseUrl()}jellies/${slug}/trims/${trimId}/${paintId}.webp`;
 }
 
+/** Camry is folder-driven: only show a color when that trim actually has a 360 or a still. */
+export function colorHasVisual(slug: string, trimId: string, paintId: string) {
+  if (hasTrimSpin(slug, trimId, paintId)) return true;
+  if (hasTrimStill(slug, trimId, paintId)) return true;
+  if (slug === "camry") return false;
+  return paintHasSpin(slug, paintId);
+}
+
 export function hasInterior(slug: string, interiorId: string) {
   return INTERIORS[slug]?.has(interiorId) ?? false;
 }
@@ -112,8 +132,8 @@ export function interiorSrc(slug: string, interiorId: string, frame: number) {
   return `${baseUrl()}interiors/${slug}/${interiorId}/${frame}.webp`;
 }
 
-export function frameAngle(slug: string, paintId: string, frame: number) {
-  const angles = toyotaCombo(slug, paintId)?.angles;
+export function frameAngle(slug: string, paintId: string, frame: number, trimId?: string) {
+  const angles = toyotaCombo(slug, paintId, trimId)?.angles;
   if (!angles?.length) return null;
   return angles[frame - 1] ?? null;
 }

@@ -17,7 +17,7 @@ import {
 } from "@/lib/cars";
 import { whatsappHref } from "@/lib/company";
 import { useLanguage } from "@/lib/language";
-import { catalogSrc, hasInterior, hasTrimStill, interiorSrc, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
+import { catalogSrc, colorHasVisual, hasInterior, hasTrimSpin, hasTrimStill, interiorSrc, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
 
 export function CarDetail({ car }: { car: Car }) {
   const { lang, t, dir } = useLanguage();
@@ -29,24 +29,23 @@ export function CarDetail({ car }: { car: Car }) {
 
   const trim: TrimLevel = car.trims.find((item) => item.id === trimId) ?? car.trims[0];
   const availableColors = useMemo(
-    () =>
-      colorsForTrim(car, trim.id).filter(
-        (item) => paintHasSpin(car.slug, item.id) || hasTrimStill(car.slug, trim.id, item.id),
-      ),
+    () => colorsForTrim(car, trim.id).filter((item) => colorHasVisual(car.slug, trim.id, item.id)),
     [car, trim.id],
+  );
+  const visibleTrims = useMemo(
+    () => car.trims.filter((item) => colorsForTrim(car, item.id).some((c) => colorHasVisual(car.slug, item.id, c.id))),
+    [car],
   );
   const availableInteriors = useMemo(
     () => interiorsForTrim(car, trim.id).filter((item) => hasInterior(car.slug, item.id)),
     [car, trim.id],
   );
-  const color: Paint = availableColors.find((item) => item.id === colorId) ?? availableColors[0];
-  const interior: Interior = availableInteriors.find((item) => item.id === interiorId) ?? availableInteriors[0];
+  const color: Paint = availableColors.find((item) => item.id === colorId) ?? availableColors[0] ?? car.colors[0];
+  const interior: Interior = availableInteriors.find((item) => item.id === interiorId) ?? availableInteriors[0] ?? car.interiors[0];
 
   function onTrim(next: string) {
     setTrimId(next);
-    const nextColors = colorsForTrim(car, next).filter(
-      (item) => paintHasSpin(car.slug, item.id) || hasTrimStill(car.slug, next, item.id),
-    );
+    const nextColors = colorsForTrim(car, next).filter((item) => colorHasVisual(car.slug, next, item.id));
     if (!nextColors.some((item) => item.id === colorId)) {
       setColorId(nextColors[0]?.id ?? car.defaultColor);
     }
@@ -56,10 +55,14 @@ export function CarDetail({ car }: { car: Car }) {
     }
   }
 
-  const spin = paintHasSpin(car.slug, color.id) && !hasTrimStill(car.slug, trim.id, color.id);
-  const exteriorStill = hasTrimStill(car.slug, trim.id, color.id)
-    ? trimStillSrc(car.slug, trim.id, color.id)
-    : catalogSrc(car.slug, color.id) || null;
+  const spin =
+    hasTrimSpin(car.slug, trim.id, color.id) ||
+    (paintHasSpin(car.slug, color.id) && !hasTrimStill(car.slug, trim.id, color.id) && car.slug !== "camry");
+  const exteriorStill = hasTrimSpin(car.slug, trim.id, color.id)
+    ? null
+    : hasTrimStill(car.slug, trim.id, color.id)
+      ? trimStillSrc(car.slug, trim.id, color.id)
+      : catalogSrc(car.slug, color.id, trim.id) || null;
   const stillSrc =
     view === "interior" && interior
       ? interiorSrc(car.slug, interior.id, 1)
@@ -91,6 +94,7 @@ export function CarDetail({ car }: { car: Car }) {
         <CarSpin
           slug={car.slug}
           paintId={color.id}
+          trimId={trim.id}
           alt={
             view === "interior"
               ? `${car.name[lang]} — ${interior?.name[lang] ?? ""}`
@@ -142,11 +146,11 @@ export function CarDetail({ car }: { car: Car }) {
             </div>
           ) : null}
 
-          {car.trims.length > 1 ? (
+          {visibleTrims.length > 1 ? (
             <div className="mt-8">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-quiet">{t.car.trim}</p>
               <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-                {car.trims.map((item) => (
+                {visibleTrims.map((item) => (
                   <button
                     key={item.id}
                     type="button"
@@ -178,7 +182,11 @@ export function CarDetail({ car }: { car: Car }) {
                   >
                     <span
                       className={`size-10 rounded-full border-2 ${item.id === color.id ? "border-ink" : "border-ink/15"}`}
-                      style={{ background: item.hex }}
+                      style={{
+                        background: item.id.endsWith("black-roof")
+                          ? `linear-gradient(180deg, #1a1a1a 38%, ${item.hex} 38%)`
+                          : item.hex,
+                      }}
                     />
                     <span className={`text-center text-[10px] leading-tight ${item.id === color.id ? "text-ink" : "text-quiet"}`}>
                       {item.name[lang]}

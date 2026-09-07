@@ -13,6 +13,10 @@ export const SPIN_PAINTS: Record<string, string[]> = {
   "sienna": ["woodland"],
 };
 
+export const TRIM_SPINS: string[] = [
+  "camry/se/wind-chill",
+];
+
 export const TRIM_STILLS: string[] = [
   "4runner/sr5/heritage-blue",
   "4runner/sr5/ice-cap",
