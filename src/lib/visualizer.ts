@@ -11,6 +11,8 @@ export type ToyotaCombo = {
   aspect?: string;
   /** Degrees for each frame index (1-based). */
   angles?: number[];
+  /** Composite the car onto the Target Motors showroom photo. */
+  showroom?: boolean;
 };
 
 const COMBOS: Record<string, ToyotaCombo> = {
@@ -36,6 +38,17 @@ const CAMRY_PNG_16: ToyotaCombo = {
   ext: "png",
   aspect: "1090/482",
   angles: CAMRY_PNG_ANGLES,
+};
+
+/** Camry XSE Wind Chill + black roof test: car on the circular studio pad. */
+const CAMRY_SHOWROOM: ToyotaCombo = {
+  frameCount: 16,
+  catalogFrame: 3,
+  fit: 0.55,
+  ext: "png",
+  aspect: "2/1",
+  angles: CAMRY_PNG_ANGLES,
+  showroom: true,
 };
 
 const SPIN_PAINTS: Record<string, Set<string>> = Object.fromEntries(
@@ -64,9 +77,14 @@ export function hasTrimSpin(slug: string, trimId: string, paintId: string) {
 }
 
 export function toyotaCombo(slug: string, paintId?: string, trimId?: string): ToyotaCombo | null {
+  if (slug === "camry" && trimId === "xse" && paintId === "wind-chill-black-roof") return CAMRY_SHOWROOM;
   if (slug && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_PNG_16;
   if (slug === "camry" && paintId === "wind-chill") return CAMRY_PNG_16;
   return COMBOS[slug] ?? null;
+}
+
+export function showroomSrc() {
+  return `${baseUrl()}studio/turntable.jpg`;
 }
 
 export function studioFit(slug: string) {

@@ -7,6 +7,7 @@ import {
   hondaSrc,
   interiorSrc,
   jellySrc,
+  showroomSrc,
   toyotaCombo,
 } from "@/lib/visualizer";
 
@@ -34,8 +35,9 @@ export function CarSpin({
   const combo = toyotaCombo(slug, paintId, trimId);
   const interior = mode === "interior" && interiorId;
   const total = interior ? 1 : frameCount(slug, paintId, trimId);
-  const fit = 1;
   const pngTurntable = combo?.ext === "png";
+  const showroom = Boolean(combo?.showroom) && !interior && !stillSrc;
+  const fit = showroom ? (combo?.fit ?? 0.55) : 1;
 
   const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
   const [expanded, setExpanded] = useState(false);
@@ -117,42 +119,69 @@ export function CarSpin({
 
   const still = stillSrc || (interior ? interiorSrc(slug, interiorId!, 1) : !combo ? hondaSrc(slug) : null);
   const nativeAspect = !expanded && pngTurntable && combo?.aspect;
+  const carStyle = showroom
+    ? {
+        width: `${fit * 100}%`,
+        height: "auto",
+        top: "60%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      }
+    : {
+        width: `${fit * 100}%`,
+        height: `${fit * 100}%`,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+      };
 
   const stage = (
     <div
       className={cn(
-        "relative overflow-hidden select-none bg-studio text-studio-fg",
+        "relative overflow-hidden select-none text-studio-fg",
+        showroom ? "bg-black" : "bg-studio",
         expanded
-          ? "fixed inset-0 z-[60] flex flex-col"
+          ? "fixed inset-0 z-[60] flex items-center justify-center"
           : nativeAspect
             ? "w-full"
             : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
       )}
-      style={nativeAspect ? { aspectRatio: combo!.aspect } : undefined}
+      style={!expanded && nativeAspect ? { aspectRatio: combo!.aspect } : undefined}
     >
       <div
         ref={stageRef}
         className={cn(
           "relative overflow-hidden touch-none",
           expanded
-            ? "h-full w-full"
+            ? showroom
+              ? "h-auto w-full max-h-full"
+              : "h-full w-full"
             : nativeAspect
               ? "h-full w-full"
               : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
           canSpin ? (grabbing ? "cursor-grabbing" : "cursor-grab") : "cursor-default",
         )}
+        style={expanded && showroom && combo?.aspect ? { aspectRatio: combo.aspect } : undefined}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
+        {showroom ? (
+          <img
+            src={showroomSrc()}
+            alt=""
+            draggable={false}
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          />
+        ) : null}
         {still ? (
           <img
             src={still}
             alt={alt}
             draggable={false}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
-            style={{ width: `${fit * 100}%`, height: `${fit * 100}%` }}
+            className="absolute object-contain"
+            style={carStyle}
           />
         ) : (
           urls.map((src, i) => (
@@ -161,11 +190,10 @@ export function CarSpin({
               src={src}
               alt=""
               draggable={false}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain"
+              className="absolute object-contain"
               style={{
+                ...carStyle,
                 opacity: i + 1 === frame ? 1 : 0,
-                width: `${fit * 100}%`,
-                height: `${fit * 100}%`,
               }}
             />
           ))
