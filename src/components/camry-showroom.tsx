@@ -82,6 +82,27 @@ export function CamryShowroom({ car }: { car: Car }) {
   const [colorId, setColorId] = useState(car.defaultColor);
   const [interiorId, setInteriorId] = useState(car.defaultInterior);
   const [view, setView] = useState<"exterior" | "interior">("exterior");
+  const [progress, setProgress] = useState(0);
+  const studioRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    const measure = () => {
+      const h = studioRef.current?.offsetHeight ?? window.innerHeight;
+      const next = Math.min(1, Math.max(0, window.scrollY / Math.max(1, h * 0.9)));
+      setProgress(next);
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   const trim: TrimLevel = car.trims.find((item) => item.id === trimId) ?? car.trims[0];
   const availableColors = useMemo(
@@ -109,8 +130,7 @@ export function CamryShowroom({ car }: { car: Car }) {
   }
 
   const spin = hasTrimSpin(car.slug, trim.id, color.id);
-  const stillSrc =
-    view === "interior" && interior ? interiorSrc(car.slug, interior.id, 1) : !spin ? null : null;
+  const stillSrc = view === "interior" && interior ? interiorSrc(car.slug, interior.id, 1) : !spin ? null : null;
   const specs = trim.specs?.length ? trim.specs : car.specs;
   const highlights = trim.highlights?.length ? trim.highlights : car.highlights;
   const wa = whatsappHref(
@@ -119,48 +139,77 @@ export function CamryShowroom({ car }: { car: Car }) {
       : `Hi, I would like a quote for the 2026 Camry ${trim.name.en} in ${color.name.en}`,
   );
   const facts = FACTS[lang];
+  const reduced =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const blur = reduced ? 0 : progress * 22;
+  const fade = progress;
+  const lift = reduced ? 0 : progress * -36;
+  const zoom = reduced ? 1 : 1 + progress * 0.05;
 
   return (
-    <article className="bg-chrome text-chrome-fg">
-      <div className="sticky top-16 z-0 bg-black">
-        <CarSpin
-          slug={car.slug}
-          paintId={color.id}
-          trimId={trim.id}
-          alt={`${car.name[lang]} — ${color.name[lang]}`}
-          mode={view}
-          interiorId={interior?.id}
-          stillSrc={stillSrc}
+    <article className="bg-bg text-ink">
+      <div ref={studioRef} className="sticky top-16 z-0 overflow-hidden bg-bg">
+        <div
+          className="will-change-[filter,transform,opacity] origin-top"
+          style={{
+            filter: `blur(${blur}px)`,
+            opacity: 1 - fade * 0.72,
+            transform: `translate3d(0, ${lift}px, 0) scale(${zoom})`,
+          }}
+        >
+          <CarSpin
+            slug={car.slug}
+            paintId={color.id}
+            trimId={trim.id}
+            alt={`${car.name[lang]} — ${color.name[lang]}`}
+            mode={view}
+            interiorId={interior?.id}
+            stillSrc={stillSrc}
+          />
+        </div>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `linear-gradient(to top, rgb(243 243 241 / ${fade * 0.12}) 0%, rgb(243 243 241 / ${fade * 0.5}) 48%, rgb(243 243 241 / ${fade * 0.95}) 100%)`,
+          }}
         />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/55 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-chrome to-transparent" />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24"
+          style={{
+            background: `linear-gradient(to top, rgb(243 243 241 / ${0.2 + fade * 0.8}), transparent)`,
+          }}
+        />
 
         <Link
           to="/toyota"
-          className="absolute start-5 top-4 z-20 inline-flex items-center gap-2 text-sm text-white/80 transition-colors hover:text-white sm:start-8 sm:top-6"
+          className="absolute start-5 top-4 z-20 inline-flex items-center gap-2 text-sm text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] transition-colors hover:text-white sm:start-8 sm:top-6"
+          style={{ opacity: Math.max(0, 1 - fade * 1.3) }}
         >
           <Back className="size-4" />
           {t.car.back}
         </Link>
-        <p className="pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-white/40">
+        <p
+          className="pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-ink/40"
+          style={{ opacity: 1 - fade * 1.4 }}
+        >
           {lang === "he" ? "גררו לסיבוב" : "Drag to turn"}
         </p>
       </div>
 
-      <div className="relative z-10 bg-chrome">
-        <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+      <div className="relative z-10 bg-bg">
+        <div className="mx-auto max-w-6xl px-5 pb-12 pt-4 sm:px-8 sm:pb-16">
           <Reveal>
             <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-brand">
               {car.year} · {lang === "he" ? "יבוא מקביל מארה״ב" : "US parallel import"}
             </p>
-            <h1 className="mt-3 font-wordmark text-4xl text-white sm:text-6xl">{car.name[lang]}</h1>
-            <p className="mt-3 text-base text-chrome-muted">
+            <h1 className="mt-3 font-wordmark text-4xl text-ink sm:text-6xl">{car.name[lang]}</h1>
+            <p className="mt-3 text-base text-quiet">
               {trim.name[lang]}
               <span className="mx-2 text-brand">/</span>
               {color.name[lang]}
               {interior ? (
                 <>
-                  <span className="mx-2 text-white/20">/</span>
+                  <span className="mx-2 text-ink/15">/</span>
                   {interior.name[lang]}
                 </>
               ) : null}
@@ -168,8 +217,8 @@ export function CamryShowroom({ car }: { car: Car }) {
           </Reveal>
 
           <Reveal delay={1} className="mt-12">
-            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-chrome-muted">{t.car.trim}</p>
-            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 border-b border-white/10">
+            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-quiet">{t.car.trim}</p>
+            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 border-b border-ink/10">
               {visibleTrims.map((item) => (
                 <button
                   key={item.id}
@@ -177,7 +226,7 @@ export function CamryShowroom({ car }: { car: Car }) {
                   onClick={() => onTrim(item.id)}
                   className={cn(
                     "relative pb-3 text-sm tracking-wide transition-colors duration-200",
-                    item.id === trim.id ? "text-white" : "text-chrome-muted hover:text-white",
+                    item.id === trim.id ? "text-ink" : "text-quiet hover:text-ink",
                   )}
                 >
                   {item.name[lang]}
@@ -190,22 +239,22 @@ export function CamryShowroom({ car }: { car: Car }) {
                 </button>
               ))}
             </div>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-chrome-muted">{trim.blurb[lang]}</p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-quiet">{trim.blurb[lang]}</p>
           </Reveal>
 
-          <Reveal delay={1} className="mt-12">
+          <Reveal delay={2} className="mt-12 rounded-none bg-paper px-5 py-8 sm:px-8">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-chrome-muted">{t.car.color}</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-quiet">{t.car.color}</p>
               {availableInteriors.length > 0 ? (
-                <div className="flex gap-1 rounded-full border border-white/10 p-1">
+                <div className="flex gap-1 border border-ink/10 bg-mist p-1">
                   {(["exterior", "interior"] as const).map((mode) => (
                     <button
                       key={mode}
                       type="button"
                       onClick={() => setView(mode)}
                       className={cn(
-                        "rounded-full px-4 py-1.5 text-xs tracking-wide transition-colors duration-200",
-                        view === mode ? "bg-white text-ink" : "text-chrome-muted hover:text-white",
+                        "px-4 py-1.5 text-xs tracking-wide transition-colors duration-200",
+                        view === mode ? "bg-chrome text-chrome-fg" : "text-quiet hover:text-ink",
                       )}
                     >
                       {mode === "exterior" ? t.car.exterior : t.car.interior}
@@ -231,11 +280,11 @@ export function CamryShowroom({ car }: { car: Car }) {
                       <span
                         className={cn(
                           "size-11 rounded-full border transition-[box-shadow,transform] duration-200",
-                          on ? "border-white scale-100 shadow-[0_0_0_2px_#e10600]" : "border-white/20 group-hover:border-white/60",
+                          on ? "border-ink shadow-[0_0_0_2px_#e10600]" : "border-ink/15 group-hover:border-ink/40",
                         )}
                         style={{ background: swatchFill(item.id, item.hex) }}
                       />
-                      <span className={cn("text-center text-[10px] leading-tight", on ? "text-white" : "text-chrome-muted")}>
+                      <span className={cn("text-center text-[10px] leading-tight", on ? "text-ink" : "text-quiet")}>
                         {item.name[lang]}
                       </span>
                     </button>
@@ -258,11 +307,11 @@ export function CamryShowroom({ car }: { car: Car }) {
                       <span
                         className={cn(
                           "size-11 rounded-full border transition-[box-shadow] duration-200",
-                          on ? "border-white shadow-[0_0_0_2px_#e10600]" : "border-white/20",
+                          on ? "border-ink shadow-[0_0_0_2px_#e10600]" : "border-ink/15",
                         )}
                         style={{ background: item.hex }}
                       />
-                      <span className={cn("text-center text-[10px] leading-tight", on ? "text-white" : "text-chrome-muted")}>
+                      <span className={cn("text-center text-[10px] leading-tight", on ? "text-ink" : "text-quiet")}>
                         {item.name[lang]}
                       </span>
                     </button>
@@ -273,14 +322,30 @@ export function CamryShowroom({ car }: { car: Car }) {
           </Reveal>
         </div>
 
-        <div className="border-y border-white/10">
-          <div className="mx-auto grid max-w-6xl gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {facts.map((fact, i) => (
-              <Reveal key={fact.k} delay={(Math.min(i, 3) + 1) as 1 | 2 | 3 | 4} className="bg-chrome px-5 py-8 sm:px-8">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-chrome-muted">{fact.k}</p>
-                <p className="mt-2 text-lg text-white">{fact.v}</p>
-              </Reveal>
-            ))}
+        <div className="border-y border-ink/10 bg-paper">
+          <div className="mx-auto grid max-w-6xl sm:grid-cols-2 lg:grid-cols-3">
+            {facts.map((fact, i) => {
+              const dark = i === 0;
+              return (
+                <Reveal
+                  key={fact.k}
+                  delay={(Math.min(i, 3) + 1) as 1 | 2 | 3 | 4}
+                  className={cn(
+                    "px-5 py-8 sm:px-8",
+                    dark ? "bg-chrome text-chrome-fg" : "bg-paper text-ink",
+                    !dark && "border-ink/10",
+                    i > 0 && "border-t sm:border-t-0",
+                    i % 2 === 1 && "sm:border-s",
+                    i >= 2 && "lg:border-s",
+                  )}
+                >
+                  <p className={cn("text-[11px] uppercase tracking-[0.22em]", dark ? "text-chrome-muted" : "text-quiet")}>
+                    {fact.k}
+                  </p>
+                  <p className="mt-2 text-lg">{fact.v}</p>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
 
@@ -288,22 +353,22 @@ export function CamryShowroom({ car }: { car: Car }) {
           <div>
             <Reveal>
               <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-brand">{t.car.fromUs}</p>
-              <h2 className="mt-3 font-wordmark text-3xl text-white sm:text-4xl">{car.tagline[lang]}</h2>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-chrome-muted">{car.description[lang]}</p>
+              <h2 className="mt-3 font-wordmark text-3xl text-ink sm:text-4xl">{car.tagline[lang]}</h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">{car.description[lang]}</p>
             </Reveal>
             <Reveal delay={1} className="mt-10 grid gap-6 sm:grid-cols-2">
               {specs.map((spec) => (
-                <div key={spec.label.en} className="border-t border-white/10 pt-4">
-                  <dt className="text-[11px] uppercase tracking-[0.18em] text-chrome-muted">{spec.label[lang]}</dt>
-                  <dd className="mt-1 text-white">{spec.value[lang]}</dd>
+                <div key={spec.label.en} className="border-t border-ink/10 pt-4">
+                  <dt className="text-[11px] uppercase tracking-[0.18em] text-quiet">{spec.label[lang]}</dt>
+                  <dd className="mt-1 text-ink">{spec.value[lang]}</dd>
                 </div>
               ))}
             </Reveal>
             <Reveal delay={2} className="mt-12">
-              <h3 className="text-[11px] font-medium uppercase tracking-[0.28em] text-chrome-muted">{t.car.highlights}</h3>
+              <h3 className="text-[11px] font-medium uppercase tracking-[0.28em] text-quiet">{t.car.highlights}</h3>
               <ul className="mt-5 space-y-3">
                 {highlights.map((item) => (
-                  <li key={item.en} className="flex gap-3 text-sm text-chrome-fg/85">
+                  <li key={item.en} className="flex gap-3 text-sm text-muted">
                     <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
                     {item[lang]}
                   </li>
@@ -313,13 +378,11 @@ export function CamryShowroom({ car }: { car: Car }) {
           </div>
 
           <Reveal delay={1}>
-            <aside className="bg-paper p-6 text-ink sm:p-8">
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-quiet">{t.car.quoteTitle}</p>
-              <h2 className="mt-2 text-2xl font-medium tracking-tight">{t.quote}</h2>
-              <p className="mt-3 text-sm text-quiet">
-                {t.car.quoteBody}
-              </p>
-              <p className="mt-1 text-sm text-ink">
+            <aside className="bg-chrome p-6 text-chrome-fg sm:p-8">
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-chrome-muted">{t.car.quoteTitle}</p>
+              <h2 className="mt-2 text-2xl font-medium tracking-tight text-white">{t.quote}</h2>
+              <p className="mt-3 text-sm text-chrome-muted">{t.car.quoteBody}</p>
+              <p className="mt-1 text-sm text-white/80">
                 {trim.name[lang]} · {color.name[lang]}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
@@ -328,11 +391,11 @@ export function CamryShowroom({ car }: { car: Car }) {
                     {t.whatsapp}
                   </a>
                 </Button>
-                <Button asChild variant="paper">
+                <Button asChild variant="chrome">
                   <a href="tel:0778053655">{t.call}</a>
                 </Button>
               </div>
-              <div className="mt-8 border-t border-rule pt-6">
+              <div className="mt-8 border-t border-white/10 pt-6 [&_label]:text-chrome-muted [&_input]:border-white/15 [&_input]:bg-white [&_input]:text-ink [&_textarea]:border-white/15 [&_textarea]:bg-white [&_textarea]:text-ink">
                 <LeadForm defaultModel={`${car.name[lang]} ${trim.name[lang]}`} />
               </div>
             </aside>
