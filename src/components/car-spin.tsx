@@ -2,7 +2,6 @@ import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  frameAngle,
   frameCount,
   hondaSrc,
   interiorSrc,
@@ -88,7 +87,6 @@ export function CarSpin({
   }
 
   const canSpin = urls.length > 1;
-  const angle = frameAngle(slug, paintId, frame, trimId);
 
   function onPointerDown(e: React.PointerEvent) {
     if (!canSpin) return;
@@ -209,17 +207,6 @@ export function CarSpin({
               <ChevronRight className="size-5" strokeWidth={1.75} />
             </NavButton>
           </>
-        ) : null}
-
-        {angle != null ? (
-          <div
-            className={cn(
-              "pointer-events-none absolute left-1/2 z-10 -translate-x-1/2 text-[11px] tracking-[0.22em]",
-              showroom ? "bottom-[16%] text-ink/45" : "bottom-4 text-neutral-500 sm:bottom-6",
-            )}
-          >
-            {`${angle}°`}
-          </div>
         ) : null}
 
         <button

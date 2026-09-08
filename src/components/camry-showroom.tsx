@@ -203,12 +203,6 @@ export function CamryShowroom({ car }: { car: Car }) {
           <Back className="size-4" />
           {t.car.back}
         </Link>
-        <p
-          className="pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-ink/40"
-          style={{ opacity: 1 - fade * 1.4 }}
-        >
-          {lang === "he" ? "גררו לסיבוב" : "Drag to turn"}
-        </p>
       </div>
 
       <div className="camry-design relative z-10">
