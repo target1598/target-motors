@@ -8,6 +8,39 @@
   isolation: isolate;
 }
 .camry-design *, .camry-design *::before, .camry-design *::after { box-sizing: border-box; }
+.camry-studio-layout { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; align-items: center; background: #f3f3f1; }
+.camry-studio-image { position: relative; min-width: 0; width: 100%; max-width: calc((100svh - 4.25rem) * 2); justify-self: center; }
+.camry-studio-controls { align-self: stretch; min-width: 0; min-height: 0; max-height: min(calc(100svh - 4.25rem), calc((100vw - 22rem) / 2)); overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #cdd0d5 #f5f6f8; padding: 1.25rem; border-inline-start: 1px solid var(--camry-border); }
+.camry-studio-heading { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; margin-bottom: .75rem; }
+.camry-studio-heading > svg { color: var(--camry-red); flex-shrink: 0; }
+.camry-studio-heading h2 { font-size: .9375rem; font-weight: 650; }
+.camry-studio-controls .camry-trims { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.camry-studio-controls .camry-trim { min-height: 44px; padding: .6rem; font-size: .875rem; }
+.camry-studio-paints { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--camry-border); }
+.camry-studio-controls .camry-view-switch { padding: 2px; gap: 1px; }
+.camry-studio-controls .camry-view-switch button { padding: .35rem .6rem; min-height: 40px; }
+.camry-studio-paint-name { margin-block: -.15rem .7rem; font-size: .875rem; line-height: 1.5; color: var(--camry-muted); }
+.camry-studio-controls .camry-swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.camry-studio-controls .camry-paint { min-height: 96px; padding: .7rem .25rem; gap: .5rem; }
+.camry-studio-controls .camry-paint-chip { width: 32px; height: 32px; }
+@media (min-width: 640px) { .camry-studio-shell { top: 4.25rem; } }
+@media (max-width: 999px) {
+  .camry-studio-layout { grid-template-columns: minmax(0, 1fr); }
+  .camry-studio-image { max-width: none; }
+  .camry-studio-controls { max-height: none; overflow-y: visible; padding: .85rem 1rem; border-inline-start: 0; border-top: 1px solid var(--camry-border); }
+  .camry-studio-heading { margin-bottom: .4rem; }
+  .camry-studio-controls .camry-trims, .camry-studio-controls .camry-swatches { display: flex; overflow-x: auto; overscroll-behavior-x: contain; gap: .5rem; padding: 4px; margin: -4px; scroll-padding-inline: 4px; scrollbar-width: thin; }
+  .camry-studio-controls .camry-trim { flex: 0 0 auto; gap: .65rem; }
+  .camry-studio-controls .camry-paint { flex: 0 0 88px; min-height: 92px; }
+  .camry-studio-paints { margin-top: .7rem; padding-top: .5rem; }
+  .camry-studio-paint-name { margin-bottom: .4rem; }
+}
+@media (min-width: 700px) and (max-width: 999px) and (max-height: 550px) {
+  .camry-studio-layout { grid-template-columns: minmax(0, 1fr) 18rem; }
+  .camry-studio-image { max-width: calc((100svh - 4.25rem) * 2); }
+  .camry-studio-controls { max-height: calc(100svh - 4.25rem); overflow-y: auto; border-top: 0; border-inline-start: 1px solid var(--camry-border); }
+  .camry-studio-controls .camry-trims, .camry-studio-controls .camry-swatches { display: grid; overflow: visible; }
+}
 .camry-shell { width: min(100% - 5rem, 1200px); margin-inline: auto; }
 .camry-scene { position: relative; padding-block: clamp(3.5rem, 6vw, 6rem); }
 .camry-config { padding-top: 3rem; background: linear-gradient(180deg, #fff 65%, #f5f6f8); }

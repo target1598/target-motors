@@ -163,7 +163,9 @@ export function CamryShowroom({ car }: { car: Car }) {
 
   return (
     <article className="bg-bg text-ink">
-      <div ref={studioRef} className="sticky top-16 z-0 overflow-hidden bg-bg">
+      <div ref={studioRef} className="camry-studio-shell sticky top-16 z-0 overflow-hidden bg-bg">
+        <div className="camry-studio-layout">
+        <div className="camry-studio-image">
         <div
           className="will-change-[filter,transform,opacity] origin-top"
           style={{
@@ -209,6 +211,59 @@ export function CamryShowroom({ car }: { car: Car }) {
         >
           {lang === "he" ? "גררו לסיבוב" : "Drag to turn"}
         </p>
+        </div>
+
+        <aside className="camry-design camry-studio-controls" aria-label={lang === "he" ? "התאמת הרכב באולם התצוגה" : "Configure your car in the showroom"}>
+          <div className="camry-studio-trims">
+            <div className="camry-studio-heading">
+              <Layers3 size={18} aria-hidden="true" />
+              <h2>{t.car.trim}</h2>
+            </div>
+            <div className="camry-trims" role="group" aria-label={t.car.trim}>
+              {visibleTrims.map((item) => (
+                <button key={item.id} type="button" onClick={() => onTrim(item.id)}
+                  aria-pressed={item.id === trim.id} className="camry-trim">
+                  <span>{item.name[lang]}</span>
+                  <span className="camry-trim-check" aria-hidden="true"><Check size={15} /></span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="camry-studio-paints">
+            <div className="camry-studio-heading">
+              <Palette size={18} aria-hidden="true" />
+              <h2>{view === "exterior" ? t.car.color : t.car.interiorColor}</h2>
+              {availableInteriors.length > 0 ? (
+                <div className="camry-view-switch" role="group" aria-label={lang === "he" ? "תצוגת הרכב" : "Vehicle view"}>
+                  {(["exterior", "interior"] as const).map((mode) => (
+                    <button key={mode} type="button" onClick={() => setView(mode)} aria-pressed={view === mode}>
+                      {mode === "exterior" ? t.car.exterior : t.car.interior}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <p className="camry-studio-paint-name" aria-live="polite">
+              {view === "exterior" ? color.name[lang] : interior?.name[lang]}
+            </p>
+            <div className="camry-swatches" role="group" aria-label={view === "exterior" ? t.car.color : t.car.interiorColor}>
+              {(view === "exterior" ? availableColors : availableInteriors).map((item) => (
+                <button key={item.id} type="button"
+                  onClick={() => view === "exterior" ? setColorId(item.id) : setInteriorId(item.id)}
+                  aria-label={item.name[lang]}
+                  aria-pressed={item.id === (view === "exterior" ? color.id : interior?.id)}
+                  className="camry-paint">
+                  <span className="camry-paint-chip"
+                    style={{ background: view === "exterior" ? swatchFill(item.id, item.hex) : item.hex }} />
+                  <span>{item.name[lang]}</span>
+                  <Check className="camry-paint-check" size={14} aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+        </div>
       </div>
 
       <div className="camry-design relative z-10">
