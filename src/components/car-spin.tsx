@@ -21,6 +21,7 @@ export function CarSpin({
   interiorId,
   stillSrc,
   trimId,
+  aspectRatio,
 }: {
   slug: string;
   paintId: string;
@@ -29,6 +30,7 @@ export function CarSpin({
   interiorId?: string;
   stillSrc?: string | null;
   trimId?: string;
+  aspectRatio?: string;
 }) {
   const { t } = useLanguage();
   const combo = toyotaCombo(slug, paintId, trimId);
@@ -144,7 +146,7 @@ export function CarSpin({
             ? "w-full"
             : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
       )}
-      style={!expanded && nativeAspect ? { aspectRatio: combo!.aspect } : undefined}
+      style={!expanded && nativeAspect ? { aspectRatio: aspectRatio ?? combo!.aspect } : undefined}
     >
       <div
         ref={stageRef}
@@ -226,7 +228,7 @@ export function CarSpin({
       {expanded ? (
         <div
           className={cn("bg-studio", nativeAspect ? "w-full" : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]")}
-          style={nativeAspect ? { aspectRatio: combo!.aspect } : undefined}
+          style={nativeAspect ? { aspectRatio: aspectRatio ?? combo!.aspect } : undefined}
           aria-hidden
         />
       ) : null}

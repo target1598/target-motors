@@ -182,6 +182,7 @@ export function CamryShowroom({ car }: { car: Car }) {
             mode={view}
             interiorId={interior?.id}
             stillSrc={stillSrc}
+            aspectRatio="var(--camry-studio-aspect, 2 / 1)"
           />
         </div>
         <div
@@ -217,7 +218,13 @@ export function CamryShowroom({ car }: { car: Car }) {
           <div className="camry-studio-trims">
             <div className="camry-studio-heading">
               <Layers3 size={18} aria-hidden="true" />
-              <h2>{t.car.trim}</h2>
+              <h2 id="camry-studio-trim-heading">{t.car.trim}</h2>
+            </div>
+            <div className="camry-studio-trim-select">
+              <select value={trim.id} onChange={(event) => onTrim(event.target.value)} aria-labelledby="camry-studio-trim-heading">
+                {visibleTrims.map((item) => <option key={item.id} value={item.id}>{item.name[lang]}</option>)}
+              </select>
+              <ChevronDown size={17} aria-hidden="true" />
             </div>
             <div className="camry-trims" role="group" aria-label={t.car.trim}>
               {visibleTrims.map((item) => (
@@ -252,6 +259,7 @@ export function CamryShowroom({ car }: { car: Car }) {
                 <button key={item.id} type="button"
                   onClick={() => view === "exterior" ? setColorId(item.id) : setInteriorId(item.id)}
                   aria-label={item.name[lang]}
+                  title={item.name[lang]}
                   aria-pressed={item.id === (view === "exterior" ? color.id : interior?.id)}
                   className="camry-paint">
                   <span className="camry-paint-chip"
