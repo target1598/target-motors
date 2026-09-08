@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Layers3, Palette, ShieldCheck, Sparkles } from "lucide-react";
 import { LeadForm } from "@/components/lead-form";
 import { CarSpin } from "@/components/car-spin";
 import { Button } from "@/components/ui/button";
@@ -15,36 +15,51 @@ import {
 import { whatsappHref } from "@/lib/company";
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
+import "./camry-showroom.css";
 import { colorHasVisual, hasInterior, hasTrimSpin, interiorSrc } from "@/lib/visualizer";
 
-function useReveal<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [on, setOn] = useState(false);
+type Motion = "rise" | "slide" | "scale";
+
+function Reveal({ children, className, delay, motion = "rise" }: {
+  children: ReactNode;
+  className?: string;
+  delay?: 1 | 2 | 3 | 4;
+  motion?: Motion;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<"idle" | "waiting" | "visible">("idle");
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    const show = () => setOn(true);
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) show();
-      },
-      { threshold: 0.06 },
-    );
-    io.observe(el);
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.94) show();
-    return () => io.disconnect();
+    if (!el || !("IntersectionObserver" in window)) return;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let observer: IntersectionObserver | undefined;
+    const observe = () => {
+      observer?.disconnect();
+      if (preference.matches) {
+        setState("visible");
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      setState(rect.top < window.innerHeight && rect.bottom > 0 ? "visible" : "waiting");
+      observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) setState("visible");
+        // Re-arm only after the whole card leaves the viewport, in either direction.
+        else if (entry.boundingClientRect.bottom <= 0 || entry.boundingClientRect.top >= window.innerHeight) {
+          setState("waiting");
+        }
+      }, { threshold: 0 });
+      observer.observe(el);
+    };
+    observe();
+    preference.addEventListener("change", observe);
+    return () => {
+      observer?.disconnect();
+      preference.removeEventListener("change", observe);
+    };
   }, []);
-  return { ref, on };
-}
-
-function Reveal({ children, className, delay }: { children: ReactNode; className?: string; delay?: 1 | 2 | 3 | 4 }) {
-  const { ref, on } = useReveal<HTMLDivElement>();
   return (
-    <div
-      ref={ref}
-      className={cn("reveal", on && "is-in", delay ? `reveal-delay-${delay}` : null, className)}
-    >
+    <div ref={ref} data-motion={motion} data-reveal={state}
+      className={cn("camry-reveal", delay && `camry-delay-${delay}`, className)}>
       {children}
     </div>
   );
@@ -196,211 +211,184 @@ export function CamryShowroom({ car }: { car: Car }) {
         </p>
       </div>
 
-      <div className="relative z-10 bg-bg">
-        <div className="mx-auto max-w-6xl px-5 pb-12 pt-4 sm:px-8 sm:pb-16">
-          <Reveal>
-            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-brand">
-              {car.year} · {lang === "he" ? "יבוא מקביל מארה״ב" : "US parallel import"}
-            </p>
-            <h1 className="mt-3 font-wordmark text-4xl text-ink sm:text-6xl">{car.name[lang]}</h1>
-            <p className="mt-3 text-base text-quiet">
-              {trim.name[lang]}
-              <span className="mx-2 text-brand">/</span>
-              {color.name[lang]}
-              {interior ? (
-                <>
-                  <span className="mx-2 text-ink/15">/</span>
-                  {interior.name[lang]}
-                </>
-              ) : null}
-            </p>
-          </Reveal>
+      <div className="camry-design relative z-10">
+        <section className="camry-scene camry-config" aria-labelledby="camry-title">
+          <div className="camry-shell">
+            <Reveal className="camry-intro">
+              <div>
+                <p className="camry-eyebrow"><span className="camry-line" />{car.year} · {t.car.fromUs}</p>
+                <h1 id="camry-title">{car.name[lang]}</h1>
+                <p className="camry-selection">
+                  <span>{trim.name[lang]}</span><span>{color.name[lang]}</span>
+                  {interior ? <span>{interior.name[lang]}</span> : null}
+                </p>
+              </div>
+              <a href="#camry-configuration" className="camry-explore">
+                {lang === "he" ? "הקאמרי שלכם" : "Your Camry"}<ChevronDown size={18} />
+              </a>
+            </Reveal>
 
-          <Reveal delay={1} className="mt-12">
-            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-quiet">{t.car.trim}</p>
-            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 border-b border-ink/10">
-              {visibleTrims.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => onTrim(item.id)}
-                  className={cn(
-                    "relative pb-3 text-sm tracking-wide transition-colors duration-200",
-                    item.id === trim.id ? "text-ink" : "text-quiet hover:text-ink",
-                  )}
-                >
-                  {item.name[lang]}
-                  <span
-                    className={cn(
-                      "absolute inset-x-0 bottom-0 h-px bg-brand transition-opacity duration-200",
-                      item.id === trim.id ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                </button>
-              ))}
-            </div>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-quiet">{trim.blurb[lang]}</p>
-          </Reveal>
-
-          <Reveal delay={2} className="mt-12 rounded-none bg-paper px-5 py-8 sm:px-8">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-quiet">{t.car.color}</p>
-              {availableInteriors.length > 0 ? (
-                <div className="flex gap-1 border border-ink/10 bg-mist p-1">
-                  {(["exterior", "interior"] as const).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => setView(mode)}
-                      className={cn(
-                        "px-4 py-1.5 text-xs tracking-wide transition-colors duration-200",
-                        view === mode ? "bg-chrome text-chrome-fg" : "text-quiet hover:text-ink",
-                      )}
-                    >
-                      {mode === "exterior" ? t.car.exterior : t.car.interior}
+            <div id="camry-configuration" className="camry-config-grid">
+              <Reveal motion="slide" className="camry-panel camry-trim-panel">
+                <div className="camry-panel-heading">
+                  <span className="camry-icon"><Layers3 size={22} strokeWidth={1.5} /></span>
+                  <div><p className="camry-eyebrow">01 / {lang === "he" ? "הבחירה שלכם" : "Make it yours"}</p>
+                    <h2>{t.car.trim}</h2></div>
+                </div>
+                <div className="camry-trims" role="group" aria-label={t.car.trim}>
+                  {visibleTrims.map((item) => (
+                    <button key={item.id} type="button" onClick={() => onTrim(item.id)}
+                      aria-pressed={item.id === trim.id} className="camry-trim">
+                      <span>{item.name[lang]}</span>
+                      <span className="camry-trim-check" aria-hidden="true"><Check size={15} /></span>
                     </button>
                   ))}
                 </div>
-              ) : null}
+                <p key={trim.id} className="camry-detail-swap camry-trim-description">{trim.blurb[lang]}</p>
+              </Reveal>
+
+              <Reveal motion="scale" delay={1} className="camry-panel camry-paint-panel">
+                <div className="camry-panel-heading">
+                  <span className="camry-icon"><Palette size={22} strokeWidth={1.5} /></span>
+                  <div><p className="camry-eyebrow">{lang === "he" ? "הגוון שלכם" : "Your finish"}</p>
+                    <h2>{view === "exterior" ? t.car.color : t.car.interiorColor}</h2></div>
+                  {availableInteriors.length > 0 ? (
+                    <div className="camry-view-switch" role="group" aria-label={lang === "he" ? "תצוגת הרכב" : "Vehicle view"}>
+                      {(["exterior", "interior"] as const).map((mode) => (
+                        <button key={mode} type="button" onClick={() => setView(mode)} aria-pressed={view === mode}>
+                          {mode === "exterior" ? t.car.exterior : t.car.interior}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+                <p className="camry-paint-name" aria-live="polite">
+                  {view === "exterior" ? color.name[lang] : interior?.name[lang]}
+                </p>
+                {view === "exterior" ? (
+                  <div className="camry-swatches" role="group" aria-label={t.car.color}>
+                    {availableColors.map((item) => {
+                      const on = item.id === color.id;
+                      return (
+                        <button key={item.id} type="button" onClick={() => setColorId(item.id)}
+                          aria-label={item.name[lang]} aria-pressed={on} className="camry-paint">
+                          <span className="camry-paint-chip" style={{ background: swatchFill(item.id, item.hex) }} />
+                          <span>{item.name[lang]}</span>
+                          <Check className="camry-paint-check" size={14} aria-hidden="true" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="camry-swatches" role="group" aria-label={t.car.interiorColor}>
+                    {availableInteriors.map((item) => {
+                      const on = item.id === interior?.id;
+                      return (
+                        <button key={item.id} type="button" onClick={() => setInteriorId(item.id)}
+                          aria-label={item.name[lang]} aria-pressed={on} className="camry-paint">
+                          <span className="camry-paint-chip" style={{ background: item.hex }} />
+                          <span>{item.name[lang]}</span>
+                          <Check className="camry-paint-check" size={14} aria-hidden="true" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        <section className="camry-scene camry-overview" aria-labelledby="camry-overview-title">
+          <div className="camry-shell">
+            <Reveal className="camry-section-heading">
+              <div><p className="camry-eyebrow">02 / {lang === "he" ? "מבט מקרוב" : "A closer look"}</p>
+                <h2 id="camry-overview-title">{lang === "he" ? "הפרטים שעושים את ההבדל" : "Details that make the difference"}</h2></div>
+              <span className="camry-outline-word" aria-hidden="true">CAMRY</span>
+            </Reveal>
+            <div className="camry-facts">
+              {facts.map((fact, i) => (
+                <Reveal key={fact.k} motion="scale" delay={(i % 3 + 1) as 1 | 2 | 3} className="camry-fact">
+                  <span className="camry-fact-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <p>{fact.k}</p><h3>{fact.v}</h3>
+                  <span className="camry-fact-line" aria-hidden="true" />
+                </Reveal>
+              ))}
             </div>
 
-            {view === "exterior" ? (
-              <div className="mt-6 flex flex-wrap gap-5">
-                {availableColors.map((item) => {
-                  const on = item.id === color.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setColorId(item.id)}
-                      aria-label={item.name[lang]}
-                      aria-pressed={on}
-                      className="group flex w-[4.5rem] flex-col items-center gap-2"
-                    >
-                      <span
-                        className={cn(
-                          "size-11 rounded-full border transition-[box-shadow,transform] duration-200",
-                          on ? "border-ink shadow-[0_0_0_2px_#e10600]" : "border-ink/15 group-hover:border-ink/40",
-                        )}
-                        style={{ background: swatchFill(item.id, item.hex) }}
-                      />
-                      <span className={cn("text-center text-[10px] leading-tight", on ? "text-ink" : "text-quiet")}>
-                        {item.name[lang]}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="mt-6 flex flex-wrap gap-5">
-                {availableInteriors.map((item) => {
-                  const on = item.id === interior?.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setInteriorId(item.id)}
-                      aria-label={item.name[lang]}
-                      aria-pressed={on}
-                      className="group flex w-20 flex-col items-center gap-2"
-                    >
-                      <span
-                        className={cn(
-                          "size-11 rounded-full border transition-[box-shadow] duration-200",
-                          on ? "border-ink shadow-[0_0_0_2px_#e10600]" : "border-ink/15",
-                        )}
-                        style={{ background: item.hex }}
-                      />
-                      <span className={cn("text-center text-[10px] leading-tight", on ? "text-ink" : "text-quiet")}>
-                        {item.name[lang]}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </Reveal>
-        </div>
-
-        <div className="border-y border-ink/10 bg-paper">
-          <div className="mx-auto grid max-w-6xl sm:grid-cols-2 lg:grid-cols-3">
-            {facts.map((fact, i) => {
-              const dark = i === 0;
-              return (
-                <Reveal
-                  key={fact.k}
-                  delay={(Math.min(i, 3) + 1) as 1 | 2 | 3 | 4}
-                  className={cn(
-                    "px-5 py-8 sm:px-8",
-                    dark ? "bg-chrome text-chrome-fg" : "bg-paper text-ink",
-                    !dark && "border-ink/10",
-                    i > 0 && "border-t sm:border-t-0",
-                    i % 2 === 1 && "sm:border-s",
-                    i >= 2 && "lg:border-s",
-                  )}
-                >
-                  <p className={cn("text-[11px] uppercase tracking-[0.22em]", dark ? "text-chrome-muted" : "text-quiet")}>
-                    {fact.k}
-                  </p>
-                  <p className="mt-2 text-lg">{fact.v}</p>
-                </Reveal>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <Reveal>
-              <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-brand">{t.car.fromUs}</p>
-              <h2 className="mt-3 font-wordmark text-3xl text-ink sm:text-4xl">{car.tagline[lang]}</h2>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">{car.description[lang]}</p>
-            </Reveal>
-            <Reveal delay={1} className="mt-10 grid gap-6 sm:grid-cols-2">
-              {specs.map((spec) => (
-                <div key={spec.label.en} className="border-t border-ink/10 pt-4">
-                  <dt className="text-[11px] uppercase tracking-[0.18em] text-quiet">{spec.label[lang]}</dt>
-                  <dd className="mt-1 text-ink">{spec.value[lang]}</dd>
+            <div className="camry-story-grid">
+              <Reveal motion="slide" className="camry-story">
+                <p className="camry-eyebrow"><span className="camry-line" />{t.car.fromUs}</p>
+                <h2>{car.tagline[lang]}</h2>
+                <p className="camry-body">{car.description[lang]}</p>
+                <div className="camry-keywords">
+                  <span><Sparkles size={16} />{car.year}</span>
+                  <span><Layers3 size={16} />{trim.name[lang]}</span>
+                  <span><ShieldCheck size={16} />Toyota Safety Sense 3.0</span>
                 </div>
-              ))}
+              </Reveal>
+              <Reveal motion="rise" delay={1} className="camry-panel camry-spec-panel">
+                <div className="camry-panel-heading">
+                  <span className="camry-icon"><Layers3 size={22} strokeWidth={1.5} /></span>
+                  <div><p className="camry-eyebrow">{trim.name[lang]}</p>
+                    <h3>{lang === "he" ? "המפרט במבט אחד" : "Specifications at a glance"}</h3></div>
+                </div>
+                <dl className="camry-specs">
+                  {specs.map((spec) => (
+                    <div key={spec.label.en}>
+                      <dt>{spec.label[lang]}</dt><dd>{spec.value[lang]}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Reveal>
+            </div>
+
+            <Reveal className="camry-section-heading camry-highlights-heading">
+              <div><p className="camry-eyebrow">{trim.name[lang]}</p><h2>{t.car.highlights}</h2></div>
             </Reveal>
-            <Reveal delay={2} className="mt-12">
-              <h3 className="text-[11px] font-medium uppercase tracking-[0.28em] text-quiet">{t.car.highlights}</h3>
-              <ul className="mt-5 space-y-3">
-                {highlights.map((item) => (
-                  <li key={item.en} className="flex gap-3 text-sm text-muted">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand" />
-                    {item[lang]}
-                  </li>
-                ))}
-              </ul>
+            <ul className="camry-highlights">
+              {highlights.map((item, i) => (
+                <li key={item.en}>
+                  <Reveal motion={i % 2 === 0 ? "rise" : "scale"} delay={(i % 3 + 1) as 1 | 2 | 3} className="camry-highlight">
+                    <span className="camry-highlight-icon"><Check size={20} strokeWidth={1.7} /></span>
+                    <span>{item[lang]}</span>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="camry-scene camry-contact" aria-labelledby="camry-quote-title">
+          <div className="camry-shell camry-contact-grid">
+            <Reveal motion="slide" className="camry-contact-story">
+              <p className="camry-eyebrow">03 / {t.car.quoteTitle}</p>
+              <h2 id="camry-quote-title">{t.quote}<span className="camry-title-dot">.</span></h2>
+              <p className="camry-body">{t.car.quoteBody}</p>
+              <div className="camry-summary">
+                <p className="camry-eyebrow">{car.name[lang]}</p>
+                <p>{trim.name[lang]}</p>
+                <div className="camry-summary-paint">
+                  <span style={{ background: swatchFill(color.id, color.hex) }} />
+                  {color.name[lang]}
+                </div>
+                {interior ? <p className="camry-summary-interior">{t.car.interior}: {interior.name[lang]}</p> : null}
+              </div>
+              <div className="camry-contact-actions">
+                <Button asChild><a href={wa} target="_blank" rel="noreferrer">{t.whatsapp}<Back size={16} /></a></Button>
+                <Button asChild variant="paper"><a href="tel:0778053655">{t.call}</a></Button>
+              </div>
+            </Reveal>
+            <Reveal motion="scale" delay={1} className="camry-panel camry-form-panel">
+              <aside>
+                <h3>{t.car.quoteTitle}</h3>
+                <div className="camry-form">
+                  <LeadForm defaultModel={`${car.name[lang]} ${trim.name[lang]}`} />
+                </div>
+              </aside>
             </Reveal>
           </div>
-
-          <Reveal delay={1}>
-            <aside className="bg-chrome p-6 text-chrome-fg sm:p-8">
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-chrome-muted">{t.car.quoteTitle}</p>
-              <h2 className="mt-2 text-2xl font-medium tracking-tight text-white">{t.quote}</h2>
-              <p className="mt-3 text-sm text-chrome-muted">{t.car.quoteBody}</p>
-              <p className="mt-1 text-sm text-white/80">
-                {trim.name[lang]} · {color.name[lang]}
-              </p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                <Button asChild>
-                  <a href={wa} target="_blank" rel="noreferrer">
-                    {t.whatsapp}
-                  </a>
-                </Button>
-                <Button asChild variant="chrome">
-                  <a href="tel:0778053655">{t.call}</a>
-                </Button>
-              </div>
-              <div className="mt-8 border-t border-white/10 pt-6 [&_label]:text-chrome-muted [&_input]:border-white/15 [&_input]:bg-white [&_input]:text-ink [&_textarea]:border-white/15 [&_textarea]:bg-white [&_textarea]:text-ink">
-                <LeadForm defaultModel={`${car.name[lang]} ${trim.name[lang]}`} />
-              </div>
-            </aside>
-          </Reveal>
-        </div>
+        </section>
       </div>
     </article>
   );
