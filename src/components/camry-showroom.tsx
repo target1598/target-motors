@@ -98,6 +98,7 @@ export function CamryShowroom({ car }: { car: Car }) {
   const [interiorId, setInteriorId] = useState(car.defaultInterior);
   const [view, setView] = useState<"exterior" | "interior">("exterior");
   const [progress, setProgress] = useState(0);
+  const [navigationHidden, setNavigationHidden] = useState(false);
   const studioRef = useRef<HTMLDivElement>(null);
   const studioPauseRef = useRef<HTMLDivElement>(null);
 
@@ -120,6 +121,7 @@ export function CamryShowroom({ car }: { car: Car }) {
         ? studio.parentElement.getBoundingClientRect().top + window.scrollY
         : 0;
       const scrollToControls = Math.max(0, articleTop + h - window.innerHeight);
+      setNavigationHidden(window.scrollY > Math.max(48, scrollToControls - 96));
       const viewingPause = studioPauseRef.current?.offsetHeight ?? 0;
       const transitionDistance = Math.max(window.innerHeight * 0.85, h * 0.9);
       const next = Math.min(1, Math.max(0, (window.scrollY - scrollToControls - viewingPause) / transitionDistance));
@@ -182,7 +184,7 @@ export function CamryShowroom({ car }: { car: Car }) {
   const zoom = reduced ? 1 : 1 + progress * 0.05;
 
   return (
-    <article className="bg-bg text-ink">
+    <article className="camry-page bg-bg text-ink" data-studio-focused={navigationHidden}>
       <div ref={studioRef} className="camry-studio-shell sticky top-16 z-0 overflow-hidden bg-bg">
         <div className="camry-studio-layout">
         <div className="camry-studio-image">

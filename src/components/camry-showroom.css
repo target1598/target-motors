@@ -8,6 +8,13 @@
   isolation: isolate;
 }
 .camry-design *, .camry-design *::before, .camry-design *::after { box-sizing: border-box; }
+.site-header { transition: transform 320ms cubic-bezier(.22, 1, .36, 1), opacity 250ms ease; }
+.camry-studio-shell { transition: top 320ms cubic-bezier(.22, 1, .36, 1); }
+body:has(.camry-page[data-studio-focused="true"]) .site-header:not(:focus-within):not([data-menu-open="true"]) { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-page[data-studio-focused="true"] .camry-studio-shell { top: min(0px, calc(100svh - var(--camry-studio-height, 0px))); }
+@media (prefers-reduced-motion: reduce) {
+  .site-header, .camry-studio-shell { transition: none; }
+}
 .camry-studio-layout { position: relative; background: #111; }
 .camry-studio-image { position: relative; min-width: 0; width: 100%; }
 /* Reserve scroll room so the next section cannot cover the controls during the viewing pause. */

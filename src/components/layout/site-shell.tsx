@@ -56,7 +56,7 @@ function Header() {
   }, [pathname]);
 
   return (
-    <header className={cn("sticky top-0 z-40 bg-chrome text-chrome-fg", scrolled && "shadow-[0_1px_0_0_rgba(255,255,255,0.08)]")}>
+    <header data-menu-open={open} className={cn("site-header sticky top-0 z-40 bg-chrome text-chrome-fg", scrolled && "shadow-[0_1px_0_0_rgba(255,255,255,0.08)]")}>
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5 sm:h-[4.25rem] sm:px-8">
         <Logo />
         <nav className="ms-auto hidden items-center gap-0.5 lg:flex" aria-label="Main">
