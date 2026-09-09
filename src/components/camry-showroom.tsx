@@ -189,7 +189,7 @@ export function CamryShowroom({ car }: { car: Car }) {
     <article className="camry-page bg-bg text-ink" data-studio-focused={navigationHidden}>
       <div ref={studioRef} className="camry-studio-shell sticky top-16 z-0 overflow-hidden bg-bg">
         <div className="camry-studio-layout">
-        <div className="camry-studio-image">
+        <div className="camry-studio-image" dir={dir}>
         <div
           className="will-change-[filter,transform,opacity] origin-top"
           style={{
@@ -238,7 +238,7 @@ export function CamryShowroom({ car }: { car: Car }) {
         </p>
         </div>
 
-        <aside ref={studioControlsRef} className="camry-design camry-studio-controls" aria-label={lang === "he" ? "התאמת הרכב באולם התצוגה" : "Configure your car in the showroom"}>
+        <aside ref={studioControlsRef} className="camry-design camry-studio-controls" dir={dir} aria-label={lang === "he" ? "התאמת הרכב באולם התצוגה" : "Configure your car in the showroom"}>
           <div className="camry-studio-trims">
             <div className="camry-studio-heading">
               <Layers3 size={18} aria-hidden="true" />
