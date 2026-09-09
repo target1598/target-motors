@@ -101,10 +101,25 @@ export function CamryShowroom({ car }: { car: Car }) {
   const studioRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const studio = studioRef.current;
+    if (!studio) return;
+    const resize = () => studio.style.setProperty("--camry-studio-height", `${studio.offsetHeight}px`);
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(studio);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     let raf = 0;
     const measure = () => {
-      const h = studioRef.current?.offsetHeight ?? window.innerHeight;
-      const next = Math.min(1, Math.max(0, window.scrollY / Math.max(1, h * 0.9)));
+      const studio = studioRef.current;
+      const h = studio?.offsetHeight ?? window.innerHeight;
+      const articleTop = studio?.parentElement
+        ? studio.parentElement.getBoundingClientRect().top + window.scrollY
+        : 0;
+      const scrollToControls = Math.max(0, articleTop + h - window.innerHeight);
+      const next = Math.min(1, Math.max(0, (window.scrollY - scrollToControls) / Math.max(1, h * 0.9)));
       setProgress(next);
     };
     const onScroll = () => {
@@ -113,9 +128,11 @@ export function CamryShowroom({ car }: { car: Car }) {
     };
     measure();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
