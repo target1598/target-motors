@@ -231,7 +231,7 @@ export function CamryShowroom({ car }: { car: Car }) {
 
         <Link
           to="/toyota"
-          className="absolute start-5 top-4 z-20 inline-flex items-center gap-2 text-sm text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] transition-colors hover:text-white sm:start-8 sm:top-6"
+          className="camry-studio-back absolute start-5 top-4 z-20 inline-flex items-center gap-2 text-sm text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] transition-colors hover:text-white sm:start-8 sm:top-6"
           style={{ opacity: Math.max(0, 1 - fade * 1.3) }}
         >
           <Back className="size-4" />

@@ -217,6 +217,7 @@ export function CarSpin({
       className={cn(
         "relative overflow-hidden select-none text-studio-fg",
         zoomable && "car-spin-zoomable",
+        zoomable && showroom && "car-spin-full-studio",
         showroom ? "bg-black" : "bg-studio",
         expanded
           ? "fixed inset-0 z-[60] flex items-center justify-center"
@@ -247,6 +248,7 @@ export function CarSpin({
         onLostPointerCapture={onPointerUp}
       >
         <div className="pointer-events-none absolute inset-0" style={zoomable ? { transform: `translate(${zoomView.x}px, ${zoomView.y}px) scale(${zoomView.scale})` } : undefined}>
+        <div className={cn("absolute inset-0", zoomable && showroom && "car-spin-scene")}>
         {showroom ? (
           <img
             src={showroomSrc()}
@@ -278,6 +280,7 @@ export function CarSpin({
             />
           ))
         )}
+        </div>
         </div>
         <span className="sr-only">{alt}</span>
 

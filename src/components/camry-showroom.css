@@ -31,6 +31,10 @@ body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-pa
   /* A taller phone frame gives the studio more presence while keeping the car prominent. */
   .car-spin-zoomable { --car-showroom-fit: 95%; --car-expanded-aspect: 4 / 3; }
   .camry-studio-image { --camry-studio-aspect: 4 / 3; max-width: none; }
+  /* Center the complete 2:1 photo and car together inside the taller phone frame. */
+  .car-spin-full-studio { background: #f3f3f1; }
+  .car-spin-full-studio .car-spin-scene { inset: 50% 0 auto; aspect-ratio: 2 / 1; transform: translateY(-50%); }
+  .camry-studio-back { color: #171717; filter: none; }
   .camry-studio-drag-hint { font-size: 10px; letter-spacing: .03em; color: #171717b3; }
   .camry-studio-summary-inner { grid-template-columns: 1fr; gap: 1rem; padding: 1.25rem 1rem; }
 }
