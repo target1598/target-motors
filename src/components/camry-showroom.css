@@ -10,6 +10,8 @@
 .camry-design *, .camry-design *::before, .camry-design *::after { box-sizing: border-box; }
 .camry-studio-layout { position: relative; background: #111; }
 .camry-studio-image { position: relative; min-width: 0; width: 100%; }
+/* Reserve scroll room so the next section cannot cover the controls during the viewing pause. */
+.camry-studio-pause { height: clamp(20rem, 60svh, 44rem); pointer-events: none; }
 .camry-studio-controls { position: relative; z-index: 25; display: grid; grid-template-columns: minmax(15rem, .7fr) minmax(0, 1.3fr); align-items: center; gap: 2rem; width: 100%; padding: 1.15rem max(2.5rem, calc((100% - 1200px) / 2)); border-block: 1px solid var(--camry-border); background: #fff; box-shadow: 0 8px 20px -18px #10131d30; }
 .camry-studio-heading { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; margin-bottom: .5rem; }
 .camry-studio-heading > svg { color: var(--camry-red); flex-shrink: 0; }

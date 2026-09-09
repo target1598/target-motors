@@ -99,6 +99,7 @@ export function CamryShowroom({ car }: { car: Car }) {
   const [view, setView] = useState<"exterior" | "interior">("exterior");
   const [progress, setProgress] = useState(0);
   const studioRef = useRef<HTMLDivElement>(null);
+  const studioPauseRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const studio = studioRef.current;
@@ -119,8 +120,10 @@ export function CamryShowroom({ car }: { car: Car }) {
         ? studio.parentElement.getBoundingClientRect().top + window.scrollY
         : 0;
       const scrollToControls = Math.max(0, articleTop + h - window.innerHeight);
-      const next = Math.min(1, Math.max(0, (window.scrollY - scrollToControls) / Math.max(1, h * 0.9)));
-      setProgress(next);
+      const viewingPause = studioPauseRef.current?.offsetHeight ?? 0;
+      const transitionDistance = Math.max(window.innerHeight * 0.85, h * 0.9);
+      const next = Math.min(1, Math.max(0, (window.scrollY - scrollToControls - viewingPause) / transitionDistance));
+      setProgress(next * next * (3 - 2 * next));
     };
     const onScroll = () => {
       cancelAnimationFrame(raf);
@@ -290,6 +293,8 @@ export function CamryShowroom({ car }: { car: Car }) {
         </aside>
         </div>
       </div>
+
+      <div ref={studioPauseRef} className="camry-studio-pause" aria-hidden="true" />
 
       <div className="camry-design relative z-10">
         <section className="camry-scene camry-config" aria-labelledby="camry-title">
