@@ -142,7 +142,7 @@ body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-pa
 .camry-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
 .camry-section-heading h2 { font-size: clamp(1.8rem, 3vw, 2.7rem); font-weight: 650; margin-top: .7rem; max-width: 650px; }
 .camry-section-heading .camry-eyebrow, .camry-contact .camry-eyebrow { color: var(--camry-red); }
-.camry-outline-word { font-size: clamp(2.75rem, 6vw, 5rem); font-weight: 800; letter-spacing: -.05em; color: transparent; -webkit-text-stroke: 1px #c8cbd1; line-height: 1; user-select: none; }
+.camry-outline-word { max-width: 45%; overflow-wrap: anywhere; text-align: end; font-size: clamp(2.75rem, 6vw, 5rem); font-weight: 800; letter-spacing: -.05em; color: transparent; -webkit-text-stroke: 1px #c8cbd1; line-height: 1; user-select: none; }
 .camry-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .camry-fact { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 164px; border: 1px solid var(--camry-border); border-radius: 16px; background: white; padding: 1.5rem; overflow: hidden; }
 .camry-fact-index { position: absolute; inset-inline-end: 1rem; top: .7rem; font-size: .75rem; font-weight: 600; color: #a6a9b0; }

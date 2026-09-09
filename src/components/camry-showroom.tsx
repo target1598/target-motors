@@ -5,6 +5,7 @@ import { LeadForm } from "@/components/lead-form";
 import { CarSpin } from "@/components/car-spin";
 import { Button } from "@/components/ui/button";
 import {
+  BODY_LABEL,
   colorsForTrim,
   interiorsForTrim,
   type Car,
@@ -16,7 +17,7 @@ import { whatsappHref } from "@/lib/company";
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
 import "./camry-showroom.css";
-import { colorHasVisual, hasInterior, hasTrimSpin, interiorSrc } from "@/lib/visualizer";
+import { colorHasVisual } from "@/lib/visualizer";
 
 type Motion = "rise" | "slide" | "scale";
 
@@ -71,26 +72,7 @@ function swatchFill(id: string, hex: string) {
   return hex;
 }
 
-const FACTS = {
-  he: [
-    { k: "יבוא", v: "מקביל מארה״ב" },
-    { k: "שנת דגם", v: "2026" },
-    { k: "מרכב", v: "סדאן 5 דלתות" },
-    { k: "מקומות", v: "חמישה" },
-    { k: "מערכת בטיחות", v: "Toyota Safety Sense 3.0" },
-    { k: "מסך", v: "עד 12.3״" },
-  ],
-  en: [
-    { k: "Import", v: "US parallel import" },
-    { k: "Model year", v: "2026" },
-    { k: "Body", v: "5-door sedan" },
-    { k: "Seats", v: "Five" },
-    { k: "Safety", v: "Toyota Safety Sense 3.0" },
-    { k: "Screen", v: "Up to 12.3\"" },
-  ],
-};
-
-export function CamryShowroom({ car }: { car: Car }) {
+export function ToyotaShowroom({ car }: { car: Car }) {
   const { lang, t, dir } = useLanguage();
   const Back = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [trimId, setTrimId] = useState(car.defaultTrim);
@@ -159,31 +141,38 @@ export function CamryShowroom({ car }: { car: Car }) {
     [car],
   );
   const availableInteriors = useMemo(
-    () => interiorsForTrim(car, trim.id).filter((item) => hasInterior(car.slug, item.id)),
+    () => interiorsForTrim(car, trim.id),
     [car, trim.id],
   );
   const color: Paint = availableColors.find((item) => item.id === colorId) ?? availableColors[0] ?? car.colors[0];
-  const interior: Interior =
-    availableInteriors.find((item) => item.id === interiorId) ?? availableInteriors[0] ?? car.interiors[0];
+  const interior: Interior | undefined =
+    availableInteriors.find((item) => item.id === interiorId) ?? availableInteriors[0];
+  const activeView = view === "interior" && interior ? "interior" : "exterior";
 
   function onTrim(next: string) {
     setTrimId(next);
     const nextColors = colorsForTrim(car, next).filter((item) => colorHasVisual(car.slug, next, item.id));
     if (!nextColors.some((item) => item.id === colorId)) setColorId(nextColors[0]?.id ?? car.defaultColor);
-    const nextInteriors = interiorsForTrim(car, next).filter((item) => hasInterior(car.slug, item.id));
-    if (!nextInteriors.some((item) => item.id === interiorId)) setInteriorId(nextInteriors[0]?.id ?? car.defaultInterior);
+    const nextInteriors = interiorsForTrim(car, next);
+    if (!nextInteriors.some((item) => item.id === interiorId)) setInteriorId(nextInteriors[0]?.id ?? "");
+    if (!nextInteriors.length) setView("exterior");
   }
 
-  const spin = hasTrimSpin(car.slug, trim.id, color.id);
-  const stillSrc = view === "interior" && interior ? interiorSrc(car.slug, interior.id, 1) : !spin ? null : null;
   const specs = trim.specs?.length ? trim.specs : car.specs;
   const highlights = trim.highlights?.length ? trim.highlights : car.highlights;
   const wa = whatsappHref(
     lang === "he"
-      ? `שלום, אשמח לקבל הצעת מחיר לקאמרי ${trim.name.he} בצבע ${color.name.he}`
-      : `Hi, I would like a quote for the 2026 Camry ${trim.name.en} in ${color.name.en}`,
+      ? `שלום, אשמח לקבל הצעת מחיר ל${car.name.he} ${trim.name.he} בצבע ${color.name.he}${interior ? ` עם פנים ${interior.name.he}` : ""}`
+      : `Hi, I would like a quote for the ${car.year} ${car.name.en} ${trim.name.en} in ${color.name.en}${interior ? ` with ${interior.name.en} interior` : ""}`,
   );
-  const facts = FACTS[lang];
+  const facts = [
+    { k: lang === "he" ? "שנת דגם" : "Model year", v: String(car.year) },
+    { k: t.car.trim, v: trim.name[lang] },
+    { k: lang === "he" ? "מרכב" : "Body", v: BODY_LABEL[car.body][lang] },
+    { k: lang === "he" ? "מקומות" : "Seats", v: String(trim.seats ?? car.seats) },
+    ...specs.filter((spec) => spec.label.en !== "Seats").slice(0, 2).map((spec) => ({ k: spec.label[lang], v: spec.value[lang] })),
+  ];
+  const safety = specs.find((spec) => spec.label.en === "Safety");
   const reduced =
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const blur = reduced ? 0 : progress * 22;
@@ -208,10 +197,9 @@ export function CamryShowroom({ car }: { car: Car }) {
             slug={car.slug}
             paintId={color.id}
             trimId={trim.id}
-            alt={`${car.name[lang]} — ${color.name[lang]}`}
-            mode={view}
+            alt={`${car.name[lang]} — ${activeView === "interior" ? interior?.name[lang] : color.name[lang]}`}
+            mode={activeView}
             interiorId={interior?.id}
-            stillSrc={stillSrc}
             aspectRatio="var(--camry-studio-aspect, 2 / 1)"
             zoomable
           />
@@ -265,11 +253,11 @@ export function CamryShowroom({ car }: { car: Car }) {
           <div className="camry-studio-paints">
             <div className="camry-studio-heading">
               <Palette size={18} aria-hidden="true" />
-              <h2>{view === "exterior" ? t.car.color : t.car.interiorColor}</h2>
+              <h2>{activeView === "exterior" ? t.car.color : t.car.interiorColor}</h2>
               {availableInteriors.length > 0 ? (
                 <div className="camry-view-switch" role="group" aria-label={lang === "he" ? "תצוגת הרכב" : "Vehicle view"}>
                   {(["exterior", "interior"] as const).map((mode) => (
-                    <button key={mode} type="button" onClick={() => setView(mode)} aria-pressed={view === mode}>
+                    <button key={mode} type="button" onClick={() => setView(mode)} aria-pressed={activeView === mode}>
                       {mode === "exterior" ? t.car.exterior : t.car.interior}
                     </button>
                   ))}
@@ -277,18 +265,18 @@ export function CamryShowroom({ car }: { car: Car }) {
               ) : null}
             </div>
             <p className="camry-studio-paint-name" aria-live="polite">
-              {view === "exterior" ? color.name[lang] : interior?.name[lang]}
+              {activeView === "exterior" ? color.name[lang] : interior?.name[lang]}
             </p>
-            <div className="camry-swatches" role="group" aria-label={view === "exterior" ? t.car.color : t.car.interiorColor}>
-              {(view === "exterior" ? availableColors : availableInteriors).map((item) => (
+            <div className="camry-swatches" role="group" aria-label={activeView === "exterior" ? t.car.color : t.car.interiorColor}>
+              {(activeView === "exterior" ? availableColors : availableInteriors).map((item) => (
                 <button key={item.id} type="button"
-                  onClick={() => view === "exterior" ? setColorId(item.id) : setInteriorId(item.id)}
+                  onClick={() => activeView === "exterior" ? setColorId(item.id) : setInteriorId(item.id)}
                   aria-label={item.name[lang]}
                   title={item.name[lang]}
-                  aria-pressed={item.id === (view === "exterior" ? color.id : interior?.id)}
+                  aria-pressed={item.id === (activeView === "exterior" ? color.id : interior?.id)}
                   className="camry-paint">
                   <span className="camry-paint-chip"
-                    style={{ background: view === "exterior" ? swatchFill(item.id, item.hex) : item.hex }} />
+                    style={{ background: activeView === "exterior" ? swatchFill(item.id, item.hex) : item.hex }} />
                   <span>{item.name[lang]}</span>
                   <Check className="camry-paint-check" size={14} aria-hidden="true" />
                 </button>
@@ -357,7 +345,7 @@ export function CamryShowroom({ car }: { car: Car }) {
             <Reveal className="camry-section-heading">
               <div><p className="camry-eyebrow">02 / {lang === "he" ? "מבט מקרוב" : "A closer look"}</p>
                 <h2 id="camry-overview-title">{lang === "he" ? "הפרטים שעושים את ההבדל" : "Details that make the difference"}</h2></div>
-              <span className="camry-outline-word" aria-hidden="true">CAMRY</span>
+              <span className="camry-outline-word" aria-hidden="true">{car.name.en.replace(/^Toyota /, "").toUpperCase()}</span>
             </Reveal>
             <div className="camry-facts">
               {facts.map((fact, i) => (
@@ -377,7 +365,7 @@ export function CamryShowroom({ car }: { car: Car }) {
                 <div className="camry-keywords">
                   <span><Sparkles size={16} />{car.year}</span>
                   <span><Layers3 size={16} />{trim.name[lang]}</span>
-                  <span><ShieldCheck size={16} />Toyota Safety Sense 3.0</span>
+                  {safety ? <span><ShieldCheck size={16} />{safety.value[lang]}</span> : null}
                 </div>
               </Reveal>
               <Reveal motion="rise" delay={1} className="camry-panel camry-spec-panel">

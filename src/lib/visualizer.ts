@@ -1,4 +1,6 @@
 import { INTERIORS as INTERIOR_MAP, INTERIOR_SPINS, SPIN_PAINTS as SPIN_MAP, TRIM_SPINS as TRIM_SPIN_LIST, TRIM_STILLS as TRIM_LIST } from "@/lib/assets.generated";
+import { TOYOTA_INTERIORS } from "@/lib/toyota-interiors.generated";
+import { toyotaInterior } from "@/lib/toyota-interiors";
 
 export type ToyotaCombo = {
   frameCount: number;
@@ -31,16 +33,7 @@ const COMBOS: Record<string, ToyotaCombo> = {
 
 /** Official Toyota 16-view jelly, 22.5° steps, starting at front (0°). Stable identity. */
 const CAMRY_PNG_ANGLES = [0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5];
-const CAMRY_PNG_16: ToyotaCombo = {
-  frameCount: 16,
-  catalogFrame: 3,
-  fit: 1,
-  ext: "png",
-  aspect: "1090/482",
-  angles: CAMRY_PNG_ANGLES,
-};
-
-/** Camry XSE Wind Chill + black roof test: car on the circular studio pad. */
+/** The supplied Toyota trim spins share the same transparent frame and showroom pad. */
 const CAMRY_SHOWROOM: ToyotaCombo = {
   frameCount: 16,
   catalogFrame: 3,
@@ -77,8 +70,7 @@ export function hasTrimSpin(slug: string, trimId: string, paintId: string) {
 }
 
 export function toyotaCombo(slug: string, paintId?: string, trimId?: string): ToyotaCombo | null {
-  if (slug === "camry" && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_SHOWROOM;
-  if (slug && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_PNG_16;
+  if (slug && trimId && paintId && hasTrimSpin(slug, trimId, paintId)) return CAMRY_SHOWROOM;
   if (slug === "camry" && paintId === "wind-chill") return CAMRY_SHOWROOM;
   return COMBOS[slug] ?? null;
 }
@@ -146,7 +138,8 @@ export function colorHasVisual(slug: string, trimId: string, paintId: string) {
   return paintHasSpin(slug, paintId);
 }
 
-export function hasInterior(slug: string, interiorId: string) {
+export function hasInterior(slug: string, interiorId: string, trimId?: string) {
+  if (TOYOTA_INTERIORS[slug]) return Boolean(trimId && toyotaInterior(slug, trimId, interiorId));
   return INTERIORS[slug]?.has(interiorId) ?? false;
 }
 
@@ -154,7 +147,12 @@ export function interiorHasSpin(slug: string, interiorId: string) {
   return INTERIOR_SPIN.has(`${slug}/${interiorId}`);
 }
 
-export function interiorSrc(slug: string, interiorId: string, frame: number) {
+export function interiorSrc(slug: string, interiorId: string, frame: number, trimId?: string) {
+  if (TOYOTA_INTERIORS[slug]) {
+    const views = trimId ? toyotaInterior(slug, trimId, interiorId)?.views : undefined;
+    const view = views?.[frame - 1];
+    return view ? `${baseUrl()}${view.src}` : "";
+  }
   return `${baseUrl()}interiors/${slug}/${interiorId}/${frame}.webp`;
 }
 

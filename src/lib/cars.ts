@@ -1,4 +1,5 @@
 import { catalogSrc } from "@/lib/visualizer";
+import { toyotaInteriorsForTrim } from "@/lib/toyota-interiors";
 
 
 export type Text = { he: string; en: string };
@@ -145,6 +146,10 @@ function toyota(
   seats: number,
   extra: Partial<Car> & { trims: TrimLevel[]; colors: Paint[]; interiors: Interior[]; specs: Spec[]; highlights: Text[] },
 ): Car {
+  const trims = extra.trims.map((trim) => ({ ...trim, interiors: toyotaInteriorsForTrim(slug, trim.id).map((item) => item.id) }));
+  const interiors = [...new Map(trims.flatMap((trim) => toyotaInteriorsForTrim(slug, trim.id)).map((item) => [item.id, item])).values()];
+  const defaults = toyotaInteriorsForTrim(slug, extra.defaultTrim ?? trims[0]?.id ?? "");
+  const defaultInterior = (slug === "camry" ? defaults.find((item) => item.code === "30LB") : undefined)?.id ?? defaults[0]?.id ?? "";
   return {
     slug,
     brand: "toyota",
@@ -157,8 +162,10 @@ function toyota(
     featured: true,
     defaultTrim: extra.trims[0]?.id ?? "le",
     defaultColor: extra.defaultColor ?? extra.colors[0]?.id ?? "ice-cap",
-    defaultInterior: extra.defaultInterior ?? extra.interiors[0]?.id ?? "black-softex",
     ...extra,
+    trims,
+    interiors,
+    defaultInterior,
   };
 }
 
@@ -711,6 +718,7 @@ export function colorsForTrim(car: Car, trimId: string): Paint[] {
   return car.colors.filter((c) => trim.colors!.includes(c.id));
 }
 export function interiorsForTrim(car: Car, trimId: string): Interior[] {
+  if (car.brand === "toyota") return toyotaInteriorsForTrim(car.slug, trimId);
   const trim = car.trims.find((t) => t.id === trimId);
   if (!trim?.interiors?.length) return car.interiors;
   return car.interiors.filter((c) => trim.interiors!.includes(c.id));
@@ -718,4 +726,3 @@ export function interiorsForTrim(car: Car, trimId: string): Interior[] {
 export function carImage(car: Car) {
   return catalogSrc(car.slug, car.defaultColor, car.defaultTrim) || `${import.meta.env.BASE_URL}cars/fallback.svg`;
 }
-

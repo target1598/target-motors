@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { LeadForm } from "@/components/lead-form";
-import { CamryShowroom } from "@/components/camry-showroom";
+import { ToyotaShowroom } from "@/components/camry-showroom";
 import { CarSpin } from "@/components/car-spin";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import { useLanguage } from "@/lib/language";
 import { catalogSrc, colorHasVisual, hasInterior, hasTrimSpin, hasTrimStill, interiorSrc, isFolderSpin, paintHasSpin, trimStillSrc } from "@/lib/visualizer";
 
 export function CarDetail({ car }: { car: Car }) {
-  if (car.slug === "camry") return <CamryShowroom car={car} />;
+  if (car.brand === "toyota") return <ToyotaShowroom key={car.slug} car={car} />;
   return <ClassicCarDetail car={car} />;
 }
 

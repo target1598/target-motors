@@ -12,6 +12,7 @@ import {
 
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
+import { toyotaInterior } from "@/lib/toyota-interiors";
 import { clampStudioView, INITIAL_STUDIO_VIEW, pinchStudioView, type StudioPoint, type StudioView } from "@/lib/studio-zoom";
 
 type StudioGesture =
@@ -42,7 +43,8 @@ export function CarSpin({
   const { t, lang } = useLanguage();
   const combo = toyotaCombo(slug, paintId, trimId);
   const interior = mode === "interior" && interiorId;
-  const total = interior ? 1 : frameCount(slug, paintId, trimId);
+  const interiorViews = useMemo(() => interior && trimId ? toyotaInterior(slug, trimId, interiorId!)?.views ?? [] : [], [slug, trimId, interiorId, interior]);
+  const total = interior ? Math.max(1, interiorViews.length) : frameCount(slug, paintId, trimId);
   const pngTurntable = combo?.ext === "png";
   const showroom = Boolean(combo?.showroom) && !interior && !stillSrc;
   const fit = showroom ? (combo?.fit ?? 0.55) : 1;
@@ -65,10 +67,11 @@ export function CarSpin({
   }, [total]);
 
   const urls = useMemo(() => {
-    if (stillSrc || interior) return [] as string[];
+    if (stillSrc) return [] as string[];
+    if (interior) return interiorViews.map((_, i) => interiorSrc(slug, interiorId!, i + 1, trimId));
     if (!combo) return [] as string[];
     return Array.from({ length: total }, (_, i) => jellySrc(slug, paintId, i + 1, trimId));
-  }, [combo, interior, paintId, slug, stillSrc, total, trimId]);
+  }, [combo, interior, interiorId, interiorViews, paintId, slug, stillSrc, total, trimId]);
 
   useEffect(() => {
     if (!urls.length) return;
@@ -170,7 +173,7 @@ export function CarSpin({
     drag.current.leftover += -dx;
     const width = stageRef.current?.clientWidth ?? 800;
     // Short swipe still turns the car; a full-width drag is a bit over one rotation.
-    const tick = Math.max(10, Math.round(width / (total * 3)));
+    const tick = interior ? Math.max(48, Math.round(width / 3)) : Math.max(10, Math.round(width / (total * 3)));
     const steps = Math.trunc(drag.current.leftover / tick);
     if (!steps) return;
     drag.current.leftover -= steps * tick;
@@ -194,7 +197,7 @@ export function CarSpin({
     setGrabbing(false);
   }
 
-  const still = stillSrc || (interior ? interiorSrc(slug, interiorId!, 1) : !combo ? hondaSrc(slug) : null);
+  const still = stillSrc || (interior && !urls.length ? interiorSrc(slug, interiorId!, 1, trimId) : !combo ? hondaSrc(slug) : null);
   const nativeAspect = pngTurntable && combo?.aspect;
   const carStyle = showroom
     ? {
@@ -283,6 +286,11 @@ export function CarSpin({
         </div>
         </div>
         <span className="sr-only">{alt}</span>
+        {interiorViews.length > 0 ? (
+          <span className="pointer-events-none absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-white/80 px-3 py-1 text-xs text-neutral-800 backdrop-blur-sm" aria-live="polite">
+            {({ side: { he: "מבט צד", en: "Side view" }, driver: { he: "מבט נהג", en: "Driver view" }, passenger: { he: "מבט נוסע", en: "Passenger view" }, bird: { he: "מבט מלמעלה", en: "Overhead view" } }[interiorViews[frame - 1]?.id ?? "side"])[lang]}
+          </span>
+        ) : null}
 
         {canSpin ? (
           <>
