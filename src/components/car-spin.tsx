@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -22,6 +22,7 @@ export function CarSpin({
   stillSrc,
   trimId,
   aspectRatio,
+  zoomable = false,
 }: {
   slug: string;
   paintId: string;
@@ -31,8 +32,9 @@ export function CarSpin({
   stillSrc?: string | null;
   trimId?: string;
   aspectRatio?: string;
+  zoomable?: boolean;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const combo = toyotaCombo(slug, paintId, trimId);
   const interior = mode === "interior" && interiorId;
   const total = interior ? 1 : frameCount(slug, paintId, trimId);
@@ -42,6 +44,7 @@ export function CarSpin({
 
   const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
   const [expanded, setExpanded] = useState(false);
+  const [magnification, setMagnification] = useState(1);
   const [grabbing, setGrabbing] = useState(false);
   const drag = useRef<{ x: number; leftover: number } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -121,24 +124,25 @@ export function CarSpin({
   const nativeAspect = !expanded && pngTurntable && combo?.aspect;
   const carStyle = showroom
     ? {
-        width: `${fit * 100}%`,
+        width: zoomable ? `var(--car-showroom-fit, ${fit * 100}%)` : `${fit * 100}%`,
         height: "auto",
         top: "60%",
         left: "50%",
-        transform: "translate(-50%, -50%)",
+        transform: `translate(-50%, -50%) scale(${zoomable ? magnification : 1})`,
       }
     : {
         width: `${fit * 100}%`,
         height: `${fit * 100}%`,
         top: "50%",
         left: "50%",
-        transform: "translate(-50%, -50%)",
+        transform: `translate(-50%, -50%) scale(${zoomable ? magnification : 1})`,
       };
 
   const stage = (
     <div
       className={cn(
         "relative overflow-hidden select-none text-studio-fg",
+        zoomable && "car-spin-zoomable",
         showroom ? "bg-black" : "bg-studio",
         expanded
           ? "fixed inset-0 z-[60] flex items-center justify-center"
@@ -211,10 +215,24 @@ export function CarSpin({
           </>
         ) : null}
 
+        {zoomable ? (
+          <div className="absolute bottom-2 left-2 z-20 flex items-center rounded-xl border border-black/15 bg-white text-neutral-800 shadow-sm sm:bottom-4 sm:left-4" dir="ltr" role="group" aria-label={lang === "he" ? "הגדלת תצוגת הרכב" : "Car zoom"}>
+            <button type="button" className="grid size-11 place-items-center rounded-l-xl hover:bg-neutral-100 disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-red-600" aria-label={lang === "he" ? "הקטנת התמונה" : "Zoom out"} disabled={magnification <= 1} onClick={() => setMagnification((value) => Math.max(1, value - .25))}>
+              <ZoomOut className="size-5" />
+            </button>
+            <button type="button" className="min-h-11 min-w-11 px-1 text-xs font-semibold hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-red-600" aria-label={lang === "he" ? "איפוס הגדלה" : "Reset zoom"} onClick={() => setMagnification(1)}>
+              {magnification.toFixed(2).replace(/\.?0+$/, "")}×
+            </button>
+            <button type="button" className="grid size-11 place-items-center rounded-r-xl hover:bg-neutral-100 disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-red-600" aria-label={lang === "he" ? "הגדלת התמונה" : "Zoom in"} disabled={magnification >= 2} onClick={() => setMagnification((value) => Math.min(2, value + .25))}>
+              <ZoomIn className="size-5" />
+            </button>
+          </div>
+        ) : null}
+
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="absolute right-4 bottom-4 z-10 grid size-11 place-items-center text-neutral-700 hover:text-black sm:right-6 sm:bottom-6"
+          className={cn("absolute right-4 bottom-4 z-10 grid size-11 place-items-center text-neutral-700 hover:text-black sm:right-6 sm:bottom-6", zoomable && "rounded-xl border border-black/15 bg-white shadow-sm")}
           aria-label={expanded ? t.car.exitFullscreen : t.car.fullscreen}
         >
           {expanded ? <Minimize2 className="size-5" strokeWidth={1.6} /> : <Maximize2 className="size-5" strokeWidth={1.6} />}

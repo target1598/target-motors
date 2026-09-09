@@ -14,7 +14,26 @@ body:has(.camry-page[data-studio-focused="true"]) .site-header:not(:focus-within
 body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-page[data-studio-focused="true"] .camry-studio-shell { --camry-navigation-space: 0px; }
 .camry-studio-layout { position: relative; background: #fff; }
 /* Fit the complete 2:1 studio and its car above the measured controls without cropping. */
-.camry-studio-image { position: relative; min-width: 0; width: 100%; max-width: max(240px, calc((100svh - var(--camry-controls-height, 9rem) - var(--camry-navigation-space)) * 2)); margin-inline: auto; transition: max-width 320ms cubic-bezier(.22, 1, .36, 1); }
+.camry-studio-image { position: relative; min-width: 0; width: 100%; max-width: max(240px, calc((100svh - var(--camry-controls-height, 9rem) - var(--camry-summary-height, 8rem) - var(--camry-navigation-space)) * 2)); margin-inline: auto; transition: max-width 320ms cubic-bezier(.22, 1, .36, 1); }
+.camry-studio-summary { position: relative; display: grid; align-items: center; flex: 1; border-top: 1px solid var(--camry-border); }
+.camry-studio-summary-inner { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); align-items: center; gap: 2rem; width: 100%; padding: 1.25rem clamp(1rem, 3vw, 3rem); }
+.camry-studio-summary h1 { margin-top: .5rem; font-size: clamp(1.5rem, 2.2vw, 2.3rem); font-weight: 750; line-height: 1.2; }
+.camry-studio-choice dl { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; margin-top: .6rem; }
+.camry-studio-choice dl > div { min-width: 0; }
+.camry-studio-choice dt { font-size: .75rem; color: var(--camry-muted); margin-bottom: .25rem; }
+.camry-studio-choice dd { display: flex; align-items: center; gap: .5rem; margin: 0; font-size: .9375rem; font-weight: 550; }
+.camry-choice-chip { width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; border: 1px solid #17181b25; }
+@media (min-width: 1000px) {
+  .camry-studio-shell { display: flex; flex-direction: column; min-height: calc(100svh - var(--camry-navigation-space)); }
+  .camry-studio-layout { flex-shrink: 0; }
+}
+@media (max-width: 639px) {
+  /* Keep the complete studio, but use much more of its width for the car on phones. */
+  .car-spin-zoomable { --car-showroom-fit: 95%; }
+  .camry-studio-image { max-width: none; }
+  .camry-studio-drag-hint { display: none; }
+  .camry-studio-summary-inner { grid-template-columns: 1fr; gap: 1rem; padding: 1.25rem 1rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   .site-header, .camry-studio-shell, .camry-studio-image { transition: none; }
 }
@@ -62,7 +81,7 @@ body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-pa
 /* Wide windows pair the complete studio with a panel on its physical right in either language. */
 @media (min-width: 1200px) and (min-aspect-ratio: 8 / 5) {
   .camry-studio-layout { display: grid; grid-template-columns: minmax(0, 1fr) clamp(20rem, 24vw, 24rem); align-items: start; direction: ltr; }
-  .camry-studio-image { grid-column: 1; grid-row: 1; max-width: max(240px, calc((100svh - var(--camry-navigation-space)) * 2)); }
+  .camry-studio-image { grid-column: 1; grid-row: 1; max-width: max(240px, calc((100svh - var(--camry-summary-height, 8rem) - var(--camry-navigation-space)) * 2)); }
   /* Let the uncropped photo set the row height; long controls scroll instead of adding white bands. */
   .camry-studio-controls { grid-column: 2; grid-row: 1; align-self: stretch; contain: size; min-height: 0; display: flex; flex-direction: column; align-items: stretch; justify-content: safe center; gap: 1.5rem; max-height: calc(100svh - var(--camry-navigation-space)); overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; padding: 1.5rem; border: 0; border-left: 1px solid var(--camry-border); box-shadow: none; }
   .camry-studio-trims, .camry-studio-paints { flex-shrink: 0; }

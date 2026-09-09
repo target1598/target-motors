@@ -101,16 +101,22 @@ export function CamryShowroom({ car }: { car: Car }) {
   const [navigationHidden, setNavigationHidden] = useState(false);
   const studioRef = useRef<HTMLDivElement>(null);
   const studioControlsRef = useRef<HTMLElement>(null);
+  const studioSummaryRef = useRef<HTMLDivElement>(null);
   const studioPauseRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const studio = studioRef.current;
     const controls = studioControlsRef.current;
-    if (!studio || !controls) return;
-    const resize = () => studio.style.setProperty("--camry-controls-height", `${controls.offsetHeight}px`);
+    const summary = studioSummaryRef.current;
+    if (!studio || !controls || !summary) return;
+    const resize = () => {
+      studio.style.setProperty("--camry-controls-height", `${controls.offsetHeight}px`);
+      studio.style.setProperty("--camry-summary-height", `${summary.offsetHeight}px`);
+    };
     resize();
     const observer = new ResizeObserver(resize);
     observer.observe(controls);
+    observer.observe(summary);
     return () => observer.disconnect();
   }, []);
 
@@ -207,6 +213,7 @@ export function CamryShowroom({ car }: { car: Car }) {
             interiorId={interior?.id}
             stillSrc={stillSrc}
             aspectRatio="var(--camry-studio-aspect, 2 / 1)"
+            zoomable
           />
         </div>
         <div
@@ -231,7 +238,7 @@ export function CamryShowroom({ car }: { car: Car }) {
           {t.car.back}
         </Link>
         <p
-          className="pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-ink/40"
+          className="camry-studio-drag-hint pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-ink/40"
           style={{ opacity: 1 - fade * 1.4 }}
         >
           {lang === "he" ? "גררו לסיבוב" : "Drag to turn"}
@@ -296,6 +303,22 @@ export function CamryShowroom({ car }: { car: Car }) {
           </div>
         </aside>
         </div>
+        <div className="camry-design camry-studio-summary" dir={dir}>
+          <div ref={studioSummaryRef} className="camry-studio-summary-inner">
+            <div>
+              <p className="camry-eyebrow"><span className="camry-line" />{car.year} · {t.car.fromUs}</p>
+              <h1 id="camry-title">{car.name[lang]}</h1>
+            </div>
+            <div className="camry-studio-choice" aria-live="polite" aria-atomic="true">
+              <p className="camry-eyebrow">{lang === "he" ? "הבחירה שלכם" : "Your selection"}</p>
+              <dl>
+                <div><dt>{t.car.trim}</dt><dd>{trim.name[lang]}</dd></div>
+                <div><dt>{t.car.exterior}</dt><dd><span className="camry-choice-chip" style={{ background: swatchFill(color.id, color.hex) }} aria-hidden="true" />{color.name[lang]}</dd></div>
+                {interior ? <div><dt>{t.car.interior}</dt><dd><span className="camry-choice-chip" style={{ background: interior.hex }} aria-hidden="true" />{interior.name[lang]}</dd></div> : null}
+              </dl>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div ref={studioPauseRef} className="camry-studio-pause" aria-hidden="true" />
@@ -303,20 +326,6 @@ export function CamryShowroom({ car }: { car: Car }) {
       <div className="camry-design relative z-10">
         <section className="camry-scene camry-config" aria-labelledby="camry-title">
           <div className="camry-shell">
-            <Reveal className="camry-intro">
-              <div>
-                <p className="camry-eyebrow"><span className="camry-line" />{car.year} · {t.car.fromUs}</p>
-                <h1 id="camry-title">{car.name[lang]}</h1>
-                <p className="camry-selection">
-                  <span>{trim.name[lang]}</span><span>{color.name[lang]}</span>
-                  {interior ? <span>{interior.name[lang]}</span> : null}
-                </p>
-              </div>
-              <a href="#camry-details" className="camry-explore">
-                {lang === "he" ? "הקאמרי שלכם" : "Your Camry"}<ChevronDown size={18} />
-              </a>
-            </Reveal>
-
             <div id="camry-details" className="camry-selected-details">
               <Reveal motion="slide" className="camry-selected-trim">
                 <p className="camry-eyebrow"><span className="camry-line" />01 / {t.car.trim}</p>
