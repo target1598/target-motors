@@ -317,8 +317,8 @@ export const CARS: Car[] = [
     { he: "טויוטה סיינה הייבריד", en: "Toyota Sienna Hybrid" },
     { he: "מיניוואן היברידי עם דלתות הזזה", en: "Hybrid minivan with sliding doors" },
     {
-      he: "סיינה 2026 היברידית בלבד. FWD ו־AWD, גרסאות Mobility ו־Technology — רק מה שיש בתיקייה.",
-      en: "2026 Sienna is hybrid-only. FWD and AWD, Mobility and Technology grades — only what is in the photo folder.",
+      he: "סיינה 2026 משלבת הנעה היברידית בכל גרסה עם שבעה או שמונה מקומות. בחרו בין הנעה קדמית לכפולה ובין רמות נוחות ואבזור שונות.",
+      en: "Every 2026 Sienna pairs hybrid power with seven or eight seats. Explore front-wheel and all-wheel drive, with different levels of comfort and equipment.",
     },
     "minivan",
     8,
@@ -349,7 +349,7 @@ export const CARS: Car[] = [
       ],
       highlights: [
         { he: "היברידית בכל הגימורים", en: "Hybrid in every trim" },
-        { he: "גרסאות Mobility בתיקייה", en: "Mobility grades in the folder" },
+        { he: "דלתות הזזה חשמליות בכל הגימורים", en: "Power sliding doors across the range" },
       ],
     },
   ),

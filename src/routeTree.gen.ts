@@ -20,6 +20,9 @@ import { Route as HondaIndexRouteImport } from './routes/honda.index'
 import { Route as HondaSlugRouteImport } from './routes/honda.$slug'
 import { Route as ToyotaIndexRouteImport } from './routes/toyota.index'
 import { Route as ToyotaSlugRouteImport } from './routes/toyota.$slug'
+import { Route as ToyotaSiennaRouteImport } from './routes/toyota.sienna'
+import { Route as ToyotaSiennaIndexRouteImport } from './routes/toyota.sienna.index'
+import { Route as ToyotaSiennaStudioRouteImport } from './routes/toyota.sienna.studio'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +79,21 @@ const ToyotaSlugRoute = ToyotaSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ToyotaRoute,
 } as any)
+const ToyotaSiennaRoute = ToyotaSiennaRouteImport.update({
+  id: '/sienna',
+  path: '/sienna',
+  getParentRoute: () => ToyotaRoute,
+} as any)
+const ToyotaSiennaIndexRoute = ToyotaSiennaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ToyotaSiennaRoute,
+} as any)
+const ToyotaSiennaStudioRoute = ToyotaSiennaStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => ToyotaSiennaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,8 +105,11 @@ export interface FileRoutesByFullPath {
   '/toyota': typeof ToyotaRouteWithChildren
   '/honda/$slug': typeof HondaSlugRoute
   '/toyota/$slug': typeof ToyotaSlugRoute
+  '/toyota/sienna': typeof ToyotaSiennaRouteWithChildren
   '/honda/': typeof HondaIndexRoute
   '/toyota/': typeof ToyotaIndexRoute
+  '/toyota/sienna/studio': typeof ToyotaSiennaStudioRoute
+  '/toyota/sienna/': typeof ToyotaSiennaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -100,6 +121,8 @@ export interface FileRoutesByTo {
   '/toyota/$slug': typeof ToyotaSlugRoute
   '/honda': typeof HondaIndexRoute
   '/toyota': typeof ToyotaIndexRoute
+  '/toyota/sienna/studio': typeof ToyotaSiennaStudioRoute
+  '/toyota/sienna': typeof ToyotaSiennaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,8 +135,11 @@ export interface FileRoutesById {
   '/toyota': typeof ToyotaRouteWithChildren
   '/honda/$slug': typeof HondaSlugRoute
   '/toyota/$slug': typeof ToyotaSlugRoute
+  '/toyota/sienna': typeof ToyotaSiennaRouteWithChildren
   '/honda/': typeof HondaIndexRoute
   '/toyota/': typeof ToyotaIndexRoute
+  '/toyota/sienna/studio': typeof ToyotaSiennaStudioRoute
+  '/toyota/sienna/': typeof ToyotaSiennaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,8 +153,11 @@ export interface FileRouteTypes {
     | '/toyota'
     | '/honda/$slug'
     | '/toyota/$slug'
+    | '/toyota/sienna'
     | '/honda/'
     | '/toyota/'
+    | '/toyota/sienna/studio'
+    | '/toyota/sienna/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -140,6 +169,8 @@ export interface FileRouteTypes {
     | '/toyota/$slug'
     | '/honda'
     | '/toyota'
+    | '/toyota/sienna/studio'
+    | '/toyota/sienna'
   id:
     | '__root__'
     | '/'
@@ -151,8 +182,11 @@ export interface FileRouteTypes {
     | '/toyota'
     | '/honda/$slug'
     | '/toyota/$slug'
+    | '/toyota/sienna'
     | '/honda/'
     | '/toyota/'
+    | '/toyota/sienna/studio'
+    | '/toyota/sienna/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +278,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToyotaSlugRouteImport
       parentRoute: typeof ToyotaRoute
     }
+    '/toyota/sienna': {
+      id: '/toyota/sienna'
+      path: '/sienna'
+      fullPath: '/toyota/sienna'
+      preLoaderRoute: typeof ToyotaSiennaRouteImport
+      parentRoute: typeof ToyotaRoute
+    }
+    '/toyota/sienna/': {
+      id: '/toyota/sienna/'
+      path: '/'
+      fullPath: '/toyota/sienna/'
+      preLoaderRoute: typeof ToyotaSiennaIndexRouteImport
+      parentRoute: typeof ToyotaSiennaRoute
+    }
+    '/toyota/sienna/studio': {
+      id: '/toyota/sienna/studio'
+      path: '/studio'
+      fullPath: '/toyota/sienna/studio'
+      preLoaderRoute: typeof ToyotaSiennaStudioRouteImport
+      parentRoute: typeof ToyotaSiennaRoute
+    }
   }
 }
 
@@ -259,13 +314,29 @@ const HondaRouteChildren: HondaRouteChildren = {
 
 const HondaRouteWithChildren = HondaRoute._addFileChildren(HondaRouteChildren)
 
+interface ToyotaSiennaRouteChildren {
+  ToyotaSiennaStudioRoute: typeof ToyotaSiennaStudioRoute
+  ToyotaSiennaIndexRoute: typeof ToyotaSiennaIndexRoute
+}
+
+const ToyotaSiennaRouteChildren: ToyotaSiennaRouteChildren = {
+  ToyotaSiennaStudioRoute: ToyotaSiennaStudioRoute,
+  ToyotaSiennaIndexRoute: ToyotaSiennaIndexRoute,
+}
+
+const ToyotaSiennaRouteWithChildren = ToyotaSiennaRoute._addFileChildren(
+  ToyotaSiennaRouteChildren,
+)
+
 interface ToyotaRouteChildren {
   ToyotaSlugRoute: typeof ToyotaSlugRoute
+  ToyotaSiennaRoute: typeof ToyotaSiennaRouteWithChildren
   ToyotaIndexRoute: typeof ToyotaIndexRoute
 }
 
 const ToyotaRouteChildren: ToyotaRouteChildren = {
   ToyotaSlugRoute: ToyotaSlugRoute,
+  ToyotaSiennaRoute: ToyotaSiennaRouteWithChildren,
   ToyotaIndexRoute: ToyotaIndexRoute,
 }
 

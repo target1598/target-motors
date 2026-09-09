@@ -1,0 +1,15 @@
+{
+  "checked": "2026-09-10",
+  "credit": "Toyota Canada",
+  "sourcePages": [
+    "https://www.toyota.ca/en/vehicles/sienna/overview/",
+    "https://www.toyota.ca/en/vehicles/sienna/features-benefits/"
+  ],
+  "images": [
+    { "file": "hero.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-design-hero-sienna-limited-blueprint-l?fit=constrain&wid=1520" },
+    { "file": "cabin.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-sienna-xse-second-row-seating" },
+    { "file": "sliding-door.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-design-sienna-limited-heavy-metal-sliding-door-l?fit=constrain&wid=1600&qlt=90" },
+    { "file": "dashboard.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-design-sienna-xse-interior-dashboard-climate-control-l?fit=constrain&wid=1600&qlt=90" },
+    { "file": "entertainment.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-technology-sienna-limited-rear-seat-entertainment-l?fit=constrain&wid=751" }
+  ]
+}

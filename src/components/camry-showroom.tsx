@@ -72,10 +72,10 @@ function swatchFill(id: string, hex: string) {
   return hex;
 }
 
-export function ToyotaShowroom({ car }: { car: Car }) {
+export function ToyotaShowroom({ car, initialTrimId, siennaOverview = false }: { car: Car; initialTrimId?: string; siennaOverview?: boolean }) {
   const { lang, t, dir } = useLanguage();
   const Back = dir === "rtl" ? ArrowRight : ArrowLeft;
-  const [trimId, setTrimId] = useState(car.defaultTrim);
+  const [trimId, setTrimId] = useState(initialTrimId ?? car.defaultTrim);
   const [colorId, setColorId] = useState(car.defaultColor);
   const [interiorId, setInteriorId] = useState(car.defaultInterior);
   const [view, setView] = useState<"exterior" | "interior">("exterior");
@@ -218,12 +218,12 @@ export function ToyotaShowroom({ car }: { car: Car }) {
         />
 
         <Link
-          to="/toyota"
+          to={siennaOverview ? "/toyota/sienna" : "/toyota"}
           className="camry-studio-back absolute start-5 top-4 z-20 inline-flex items-center gap-2 text-sm text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)] transition-colors hover:text-white sm:start-8 sm:top-6"
           style={{ opacity: Math.max(0, 1 - fade * 1.3) }}
         >
           <Back className="size-4" />
-          {t.car.back}
+          {siennaOverview ? (lang === "he" ? "בחזרה לסיינה" : "Back to Sienna") : t.car.back}
         </Link>
         </div>
 
