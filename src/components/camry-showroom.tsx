@@ -237,13 +237,6 @@ export function CamryShowroom({ car }: { car: Car }) {
           <Back className="size-4" />
           {t.car.back}
         </Link>
-        <p
-          className="camry-studio-drag-hint pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-ink/40"
-          style={{ opacity: 1 - fade * 1.4 }}
-        >
-          <span className="hidden sm:inline">{lang === "he" ? "גררו לסיבוב" : "Drag to turn"}</span>
-          <span className="sm:hidden">{lang === "he" ? "גררו לסיבוב · צבטו להגדלה" : "Drag to turn · Pinch to zoom"}</span>
-        </p>
         </div>
 
         <aside ref={studioControlsRef} className="camry-design camry-studio-controls" dir={dir} aria-label={lang === "he" ? "התאמת הרכב באולם התצוגה" : "Configure your car in the showroom"}>
