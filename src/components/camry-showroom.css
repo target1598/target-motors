@@ -28,9 +28,10 @@ body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-pa
   .camry-studio-layout { flex-shrink: 0; }
 }
 @media (max-width: 639px) {
-  /* Fill the phone width with the original studio proportions and natural car scale. */
-  .car-spin-zoomable { --car-expanded-aspect: 2 / 1; }
-  .camry-studio-image { --camry-studio-aspect: 2 / 1; max-width: none; }
+  /* Enlarge the original 2:1 scene uniformly inside the taller phone frame. */
+  .car-spin-zoomable { --car-expanded-aspect: 4 / 3; }
+  .car-spin-full-studio .car-spin-scene { inset: 0 auto 0 50%; width: auto; height: 100%; aspect-ratio: 2 / 1; transform: translateX(-50%); }
+  .camry-studio-image { --camry-studio-aspect: 4 / 3; max-width: none; }
   .camry-studio-summary-inner { grid-template-columns: 1fr; gap: 1rem; padding: 1.25rem 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
