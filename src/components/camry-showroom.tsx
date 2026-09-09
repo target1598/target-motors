@@ -286,77 +286,38 @@ export function CamryShowroom({ car }: { car: Car }) {
                   {interior ? <span>{interior.name[lang]}</span> : null}
                 </p>
               </div>
-              <a href="#camry-configuration" className="camry-explore">
+              <a href="#camry-details" className="camry-explore">
                 {lang === "he" ? "הקאמרי שלכם" : "Your Camry"}<ChevronDown size={18} />
               </a>
             </Reveal>
 
-            <div id="camry-configuration" className="camry-config-grid">
-              <Reveal motion="slide" className="camry-panel camry-trim-panel">
-                <div className="camry-panel-heading">
-                  <span className="camry-icon"><Layers3 size={22} strokeWidth={1.5} /></span>
-                  <div><p className="camry-eyebrow">01 / {lang === "he" ? "הבחירה שלכם" : "Make it yours"}</p>
-                    <h2>{t.car.trim}</h2></div>
-                </div>
-                <div className="camry-trims" role="group" aria-label={t.car.trim}>
-                  {visibleTrims.map((item) => (
-                    <button key={item.id} type="button" onClick={() => onTrim(item.id)}
-                      aria-pressed={item.id === trim.id} className="camry-trim">
-                      <span>{item.name[lang]}</span>
-                      <span className="camry-trim-check" aria-hidden="true"><Check size={15} /></span>
-                    </button>
-                  ))}
-                </div>
-                <p key={trim.id} className="camry-detail-swap camry-trim-description">{trim.blurb[lang]}</p>
+            <div id="camry-details" className="camry-selected-details">
+              <Reveal motion="slide" className="camry-selected-trim">
+                <p className="camry-eyebrow"><span className="camry-line" />01 / {t.car.trim}</p>
+                <h2 key={trim.id} className="camry-detail-swap">{trim.name[lang]}</h2>
+                <p key={`description-${trim.id}`} className="camry-detail-swap camry-selected-copy">{trim.blurb[lang]}</p>
               </Reveal>
 
-              <Reveal motion="scale" delay={1} className="camry-panel camry-paint-panel">
-                <div className="camry-panel-heading">
-                  <span className="camry-icon"><Palette size={22} strokeWidth={1.5} /></span>
-                  <div><p className="camry-eyebrow">{lang === "he" ? "הגוון שלכם" : "Your finish"}</p>
-                    <h2>{view === "exterior" ? t.car.color : t.car.interiorColor}</h2></div>
-                  {availableInteriors.length > 0 ? (
-                    <div className="camry-view-switch" role="group" aria-label={lang === "he" ? "תצוגת הרכב" : "Vehicle view"}>
-                      {(["exterior", "interior"] as const).map((mode) => (
-                        <button key={mode} type="button" onClick={() => setView(mode)} aria-pressed={view === mode}>
-                          {mode === "exterior" ? t.car.exterior : t.car.interior}
-                        </button>
-                      ))}
+              <Reveal motion="scale" delay={1} className="camry-selected-finish">
+                <p className="camry-eyebrow">{lang === "he" ? "הגימור שלכם" : "Your finish"}</p>
+                <dl className="camry-finish-details">
+                  <div>
+                    <dt>{t.car.exterior}</dt>
+                    <dd>
+                      <span className="camry-finish-sample" style={{ background: swatchFill(color.id, color.hex) }} aria-hidden="true" />
+                      <span key={color.id} className="camry-detail-swap">{color.name[lang]}</span>
+                    </dd>
+                  </div>
+                  {interior ? (
+                    <div>
+                      <dt>{t.car.interior}</dt>
+                      <dd>
+                        <span className="camry-finish-sample" style={{ background: interior.hex }} aria-hidden="true" />
+                        <span key={interior.id} className="camry-detail-swap">{interior.name[lang]}</span>
+                      </dd>
                     </div>
                   ) : null}
-                </div>
-                <p className="camry-paint-name" aria-live="polite">
-                  {view === "exterior" ? color.name[lang] : interior?.name[lang]}
-                </p>
-                {view === "exterior" ? (
-                  <div className="camry-swatches" role="group" aria-label={t.car.color}>
-                    {availableColors.map((item) => {
-                      const on = item.id === color.id;
-                      return (
-                        <button key={item.id} type="button" onClick={() => setColorId(item.id)}
-                          aria-label={item.name[lang]} aria-pressed={on} className="camry-paint">
-                          <span className="camry-paint-chip" style={{ background: swatchFill(item.id, item.hex) }} />
-                          <span>{item.name[lang]}</span>
-                          <Check className="camry-paint-check" size={14} aria-hidden="true" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="camry-swatches" role="group" aria-label={t.car.interiorColor}>
-                    {availableInteriors.map((item) => {
-                      const on = item.id === interior?.id;
-                      return (
-                        <button key={item.id} type="button" onClick={() => setInteriorId(item.id)}
-                          aria-label={item.name[lang]} aria-pressed={on} className="camry-paint">
-                          <span className="camry-paint-chip" style={{ background: item.hex }} />
-                          <span>{item.name[lang]}</span>
-                          <Check className="camry-paint-check" size={14} aria-hidden="true" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                </dl>
               </Reveal>
             </div>
           </div>
