@@ -28,10 +28,10 @@ body:has(.site-header:not(:focus-within):not([data-menu-open="true"])) .camry-pa
   .camry-studio-layout { flex-shrink: 0; }
 }
 @media (max-width: 639px) {
-  /* Keep the complete studio, but use much more of its width for the car on phones. */
-  .car-spin-zoomable { --car-showroom-fit: 95%; }
-  .camry-studio-image { max-width: none; }
-  .camry-studio-drag-hint { display: none; }
+  /* A taller phone frame gives the studio more presence while keeping the car prominent. */
+  .car-spin-zoomable { --car-showroom-fit: 95%; --car-expanded-aspect: 4 / 3; }
+  .camry-studio-image { --camry-studio-aspect: 4 / 3; max-width: none; }
+  .camry-studio-drag-hint { font-size: 10px; letter-spacing: .03em; color: #171717b3; }
   .camry-studio-summary-inner { grid-template-columns: 1fr; gap: 1rem; padding: 1.25rem 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {

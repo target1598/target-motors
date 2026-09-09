@@ -241,7 +241,8 @@ export function CamryShowroom({ car }: { car: Car }) {
           className="camry-studio-drag-hint pointer-events-none absolute inset-x-0 bottom-3 z-20 text-center text-[10px] uppercase tracking-[0.28em] text-ink/40"
           style={{ opacity: 1 - fade * 1.4 }}
         >
-          {lang === "he" ? "גררו לסיבוב" : "Drag to turn"}
+          <span className="hidden sm:inline">{lang === "he" ? "גררו לסיבוב" : "Drag to turn"}</span>
+          <span className="sm:hidden">{lang === "he" ? "גררו לסיבוב · צבטו להגדלה" : "Drag to turn · Pinch to zoom"}</span>
         </p>
         </div>
 

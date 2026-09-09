@@ -1,5 +1,5 @@
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, RotateCcw, ZoomIn } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   frameCount,
@@ -12,6 +12,11 @@ import {
 
 import { useLanguage } from "@/lib/language";
 import { cn } from "@/lib/utils";
+import { clampStudioView, INITIAL_STUDIO_VIEW, pinchStudioView, type StudioPoint, type StudioView } from "@/lib/studio-zoom";
+
+type StudioGesture =
+  | { kind: "pinch"; view: StudioView; anchor: StudioPoint; distance: number }
+  | { kind: "pan"; view: StudioView; point: StudioPoint };
 
 export function CarSpin({
   slug,
@@ -44,10 +49,20 @@ export function CarSpin({
 
   const [frame, setFrame] = useState(interior ? 1 : (combo?.catalogFrame ?? 1));
   const [expanded, setExpanded] = useState(false);
-  const [magnification, setMagnification] = useState(1);
+  const [zoomView, setZoomView] = useState(INITIAL_STUDIO_VIEW);
   const [grabbing, setGrabbing] = useState(false);
   const drag = useRef<{ x: number; leftover: number } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef(INITIAL_STUDIO_VIEW);
+  const pointers = useRef(new Map<number, StudioPoint>());
+  const gesture = useRef<StudioGesture | null>(null);
+  const updateView = useCallback((next: StudioView) => {
+    viewRef.current = next;
+    setZoomView((previous) => previous.scale === next.scale && previous.x === next.x && previous.y === next.y ? previous : next);
+  }, []);
+  const step = useCallback((delta: number) => {
+    setFrame((f) => ((((f - 1 + delta) % total) + total) % total) + 1);
+  }, [total]);
 
   const urls = useMemo(() => {
     if (stillSrc || interior) return [] as string[];
@@ -85,23 +100,70 @@ export function CarSpin({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [expanded, total]);
+  }, [expanded, step]);
 
-  function step(delta: number) {
-    setFrame((f) => ((((f - 1 + delta) % total) + total) % total) + 1);
-  }
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!zoomable || !stage) return;
+    const resize = () => updateView(clampStudioView(viewRef.current, { width: stage.clientWidth, height: stage.clientHeight }));
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, [expanded, zoomable, updateView]);
 
   const canSpin = urls.length > 1;
 
-  function onPointerDown(e: React.PointerEvent) {
-    if (!canSpin) return;
+  function rebaseGesture() {
+    const points = [...pointers.current.values()];
+    drag.current = null;
+    gesture.current = null;
+    if (points.length >= 2) {
+      const rect = stageRef.current!.getBoundingClientRect();
+      gesture.current = {
+        kind: "pinch", view: viewRef.current,
+        anchor: { x: (points[0].x + points[1].x) / 2 - rect.left - rect.width / 2, y: (points[0].y + points[1].y) / 2 - rect.top - rect.height / 2 },
+        distance: Math.max(1, Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)),
+      };
+    } else if (points.length === 1) {
+      if (viewRef.current.scale > 1) gesture.current = { kind: "pan", view: viewRef.current, point: points[0] };
+      else if (canSpin) drag.current = { x: points[0].x, leftover: 0 };
+    }
+    setGrabbing(points.length > 0);
+  }
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    if (!canSpin && !zoomable) return;
     if ((e.target as HTMLElement).closest("button")) return;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (zoomable) {
+      pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      rebaseGesture();
+      return;
+    }
     drag.current = { x: e.clientX, leftover: 0 };
     setGrabbing(true);
   }
 
   function onPointerMove(e: React.PointerEvent) {
+    if (zoomable && !pointers.current.has(e.pointerId)) return;
+    if (zoomable && pointers.current.has(e.pointerId)) {
+      pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const active = gesture.current;
+      const rect = stageRef.current!.getBoundingClientRect();
+      const size = { width: rect.width, height: rect.height };
+      if (active?.kind === "pinch") {
+        const [a, b] = [...pointers.current.values()];
+        const distance = Math.hypot(a.x - b.x, a.y - b.y);
+        const anchor = { x: (a.x + b.x) / 2 - rect.left - rect.width / 2, y: (a.y + b.y) / 2 - rect.top - rect.height / 2 };
+        updateView(pinchStudioView(active.view, active.view.scale * distance / active.distance, active.anchor, anchor, size));
+        return;
+      }
+      if (active?.kind === "pan") {
+        updateView(clampStudioView({ ...active.view, x: active.view.x + e.clientX - active.point.x, y: active.view.y + e.clientY - active.point.y }, size));
+        return;
+      }
+    }
     if (!drag.current || !canSpin) return;
     const dx = e.clientX - drag.current.x;
     drag.current.x = e.clientX;
@@ -115,27 +177,39 @@ export function CarSpin({
     step(steps);
   }
 
-  function onPointerUp() {
+  function onPointerUp(e: React.PointerEvent) {
+    if (zoomable) {
+      if (!pointers.current.delete(e.pointerId)) return;
+      rebaseGesture();
+      return;
+    }
+    drag.current = null;
+    setGrabbing(false);
+  }
+
+  function onPointerCancel() {
+    pointers.current.clear();
+    gesture.current = null;
     drag.current = null;
     setGrabbing(false);
   }
 
   const still = stillSrc || (interior ? interiorSrc(slug, interiorId!, 1) : !combo ? hondaSrc(slug) : null);
-  const nativeAspect = !expanded && pngTurntable && combo?.aspect;
+  const nativeAspect = pngTurntable && combo?.aspect;
   const carStyle = showroom
     ? {
         width: zoomable ? `var(--car-showroom-fit, ${fit * 100}%)` : `${fit * 100}%`,
         height: "auto",
         top: "60%",
         left: "50%",
-        transform: `translate(-50%, -50%) scale(${zoomable ? magnification : 1})`,
+        transform: "translate(-50%, -50%)",
       }
     : {
         width: `${fit * 100}%`,
         height: `${fit * 100}%`,
         top: "50%",
         left: "50%",
-        transform: `translate(-50%, -50%) scale(${zoomable ? magnification : 1})`,
+        transform: "translate(-50%, -50%)",
       };
 
   const stage = (
@@ -165,12 +239,14 @@ export function CarSpin({
               : "min-h-[48vh] sm:min-h-[54vh] lg:min-h-[60vh]",
           canSpin ? (grabbing ? "cursor-grabbing" : "cursor-grab") : "cursor-default",
         )}
-        style={expanded && showroom && combo?.aspect ? { aspectRatio: combo.aspect } : undefined}
+        style={expanded && showroom && combo?.aspect ? { aspectRatio: zoomable ? "var(--car-expanded-aspect, 2 / 1)" : combo.aspect } : undefined}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onLostPointerCapture={onPointerUp}
       >
+        <div className="pointer-events-none absolute inset-0" style={zoomable ? { transform: `translate(${zoomView.x}px, ${zoomView.y}px) scale(${zoomView.scale})` } : undefined}>
         {showroom ? (
           <img
             src={showroomSrc()}
@@ -202,6 +278,7 @@ export function CarSpin({
             />
           ))
         )}
+        </div>
         <span className="sr-only">{alt}</span>
 
         {canSpin ? (
@@ -216,26 +293,24 @@ export function CarSpin({
         ) : null}
 
         {zoomable ? (
-          <div className="absolute bottom-2 left-2 z-20 flex items-center rounded-xl border border-black/15 bg-white text-neutral-800 shadow-sm sm:bottom-4 sm:left-4" dir="ltr" role="group" aria-label={lang === "he" ? "הגדלת תצוגת הרכב" : "Car zoom"}>
-            <button type="button" className="grid size-11 place-items-center rounded-l-xl hover:bg-neutral-100 disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-red-600" aria-label={lang === "he" ? "הקטנת התמונה" : "Zoom out"} disabled={magnification <= 1} onClick={() => setMagnification((value) => Math.max(1, value - .25))}>
-              <ZoomOut className="size-5" />
-            </button>
-            <button type="button" className="min-h-11 min-w-11 px-1 text-xs font-semibold hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-red-600" aria-label={lang === "he" ? "איפוס הגדלה" : "Reset zoom"} onClick={() => setMagnification(1)}>
-              {magnification.toFixed(2).replace(/\.?0+$/, "")}×
-            </button>
-            <button type="button" className="grid size-11 place-items-center rounded-r-xl hover:bg-neutral-100 disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-red-600" aria-label={lang === "he" ? "הגדלת התמונה" : "Zoom in"} disabled={magnification >= 2} onClick={() => setMagnification((value) => Math.min(2, value + .25))}>
-              <ZoomIn className="size-5" />
-            </button>
-          </div>
+          <button type="button" className="absolute bottom-2 left-2 z-20 grid size-11 place-items-center rounded-full text-neutral-800 focus-visible:outline-2 focus-visible:outline-red-600 sm:bottom-4 sm:left-4"
+            aria-label={zoomView.scale > 1 ? (lang === "he" ? "איפוס הגדלה" : "Reset zoom") : (lang === "he" ? "הגדלת התמונה" : "Zoom in")}
+            onClick={() => updateView(zoomView.scale > 1 ? INITIAL_STUDIO_VIEW : { scale: 1.75, x: 0, y: 0 })}>
+            <span className="grid size-8 place-items-center rounded-full border border-white/60 bg-white/25 shadow-sm backdrop-blur-md">
+              {zoomView.scale > 1 ? <RotateCcw className="size-4" /> : <ZoomIn className="size-4" />}
+            </span>
+          </button>
         ) : null}
 
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className={cn("absolute right-4 bottom-4 z-10 grid size-11 place-items-center text-neutral-700 hover:text-black sm:right-6 sm:bottom-6", zoomable && "rounded-xl border border-black/15 bg-white shadow-sm")}
+          className={cn("absolute z-10 grid size-11 place-items-center text-neutral-700 hover:text-black", zoomable ? "right-2 bottom-2 sm:right-4 sm:bottom-4" : "right-4 bottom-4 sm:right-6 sm:bottom-6")}
           aria-label={expanded ? t.car.exitFullscreen : t.car.fullscreen}
         >
-          {expanded ? <Minimize2 className="size-5" strokeWidth={1.6} /> : <Maximize2 className="size-5" strokeWidth={1.6} />}
+          <span className={cn("grid size-8 place-items-center", zoomable && "rounded-full border border-white/60 bg-white/25 shadow-sm backdrop-blur-md")}>
+            {expanded ? <Minimize2 className={zoomable ? "size-4" : "size-5"} strokeWidth={1.6} /> : <Maximize2 className={zoomable ? "size-4" : "size-5"} strokeWidth={1.6} />}
+          </span>
         </button>
       </div>
     </div>
