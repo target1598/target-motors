@@ -100,15 +100,17 @@ export function CamryShowroom({ car }: { car: Car }) {
   const [progress, setProgress] = useState(0);
   const [navigationHidden, setNavigationHidden] = useState(false);
   const studioRef = useRef<HTMLDivElement>(null);
+  const studioControlsRef = useRef<HTMLElement>(null);
   const studioPauseRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const studio = studioRef.current;
-    if (!studio) return;
-    const resize = () => studio.style.setProperty("--camry-studio-height", `${studio.offsetHeight}px`);
+    const controls = studioControlsRef.current;
+    if (!studio || !controls) return;
+    const resize = () => studio.style.setProperty("--camry-controls-height", `${controls.offsetHeight}px`);
     resize();
     const observer = new ResizeObserver(resize);
-    observer.observe(studio);
+    observer.observe(controls);
     return () => observer.disconnect();
   }, []);
 
@@ -236,7 +238,7 @@ export function CamryShowroom({ car }: { car: Car }) {
         </p>
         </div>
 
-        <aside className="camry-design camry-studio-controls" aria-label={lang === "he" ? "התאמת הרכב באולם התצוגה" : "Configure your car in the showroom"}>
+        <aside ref={studioControlsRef} className="camry-design camry-studio-controls" aria-label={lang === "he" ? "התאמת הרכב באולם התצוגה" : "Configure your car in the showroom"}>
           <div className="camry-studio-trims">
             <div className="camry-studio-heading">
               <Layers3 size={18} aria-hidden="true" />
