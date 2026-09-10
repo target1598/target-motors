@@ -6,7 +6,8 @@
     "https://www.toyota.ca/en/vehicles/sienna/features-benefits/"
   ],
   "images": [
-    { "file": "hero.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-design-hero-sienna-limited-blueprint-l?fit=constrain&wid=1520" },
+    { "file": "hero-heavy-metal.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-hero-sienna-limited-heavy-metal-l?fit=constrain&wid=1800&qlt=86&fmt=webp" },
+    { "file": "hero-heavy-metal-mobile.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-hero-sienna-limited-heavy-metal-p?fit=constrain&wid=800&qlt=86&fmt=webp" },
     { "file": "cabin.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-sienna-xse-second-row-seating" },
     { "file": "sliding-door.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-design-sienna-limited-heavy-metal-sliding-door-l?fit=constrain&wid=1600&qlt=90" },
     { "file": "dashboard.webp", "source": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-features-design-sienna-xse-interior-dashboard-climate-control-l?fit=constrain&wid=1600&qlt=90" },

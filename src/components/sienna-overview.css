@@ -5,30 +5,30 @@
 .sienna-model-nav > div > span:nth-child(2) { color: #a7a7ac; }
 .sienna-studio-link { display: inline-flex; align-items: center; gap: .65rem; font-weight: 600; }
 .sienna-studio-link svg { color: var(--sienna-red); }
-.sienna-hero-panel { background: var(--sienna-red); color: #fff; }
-.sienna-hero { display: grid; grid-template-columns: .85fr 1.4fr; align-items: center; gap: clamp(2rem, 4vw, 5rem); padding-block: 4.5rem; }
+.sienna-hero-panel { background: #fff; color: var(--sienna-ink); }
+.sienna-hero { display: grid; gap: 2.5rem; padding-block: 3rem; }
 .sienna-kicker { display: flex; align-items: center; gap: .8rem; color: var(--sienna-red); font-size: .8125rem; font-weight: 650; letter-spacing: .09em; margin-bottom: 1.1rem; }
 .sienna-kicker::before { content: ""; width: 2rem; height: 2px; background: currentColor; flex-shrink: 0; transform-origin: left; transition: transform 1300ms cubic-bezier(.22,1,.36,1); }
 [dir="rtl"] .sienna-kicker::before { transform-origin: right; }
-.sienna-hero h1 { font-family: "Oswald", "Heebo", sans-serif; font-size: clamp(4.2rem, 7vw, 7.5rem); letter-spacing: -.035em; font-weight: 600; line-height: 1; direction: ltr; text-align: start; width: fit-content; }
+.sienna-hero h1 { font-family: "Oswald", "Heebo", sans-serif; font-size: clamp(4.2rem, 7vw, 7.5rem); letter-spacing: -.035em; font-weight: 600; line-height: 1; direction: ltr; text-align: start; width: fit-content; color: var(--sienna-red); }
 .sienna-hero h1 span { color: #191a1d; }
-.sienna-hero h2 { font-size: clamp(1.8rem, 2.2vw, 2.5rem); font-weight: 650; margin-block: 1.5rem 1rem; }
-.sienna-hero-copy > p:not(.sienna-kicker) { color: #fff; font-size: 1.0625rem; line-height: 1.85; max-width: 37ch; }
-.sienna-hero .sienna-kicker { color: #fff; }
-.sienna-hero-copy { animation: sienna-arrive 1100ms cubic-bezier(.22,1,.36,1) both; }
+.sienna-hero h2 { font-size: clamp(1.8rem, 2.2vw, 2.5rem); font-weight: 650; margin-bottom: .85rem; }
+.sienna-hero-intro > p { color: var(--sienna-muted); font-size: 1.0625rem; line-height: 1.85; max-width: 62ch; }
+.sienna-hero .sienna-kicker { color: var(--sienna-muted); }
+.sienna-hero .sienna-kicker::before { background: var(--sienna-red); }
+.sienna-hero-copy { display: grid; grid-template-columns: .85fr 1.4fr; align-items: center; gap: clamp(2rem, 4vw, 5rem); animation: sienna-arrive 1100ms cubic-bezier(.22,1,.36,1) both; }
+.sienna-hero-heading, .sienna-hero-intro { min-width: 0; }
+.sienna-hero .sienna-actions { margin-top: 1.4rem; }
 .sienna-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
 .sienna-button { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; padding: .85rem 1.2rem; min-height: 48px; border-radius: 6px; font-size: .9375rem; font-weight: 600; transition: background 300ms ease, color 300ms ease; }
 .sienna-overview .sienna-button-red { background: var(--sienna-red); color: #fff; }
 .sienna-button-red:hover { background: var(--sienna-red-dark); }
 .sienna-button-light { background: #fff; border: 1px solid #ced0d5; }
 .sienna-button-light:hover { background: #f5f5f6; }
-.sienna-hero .sienna-button-red { background: #191a1d; color: #fff; }
-.sienna-hero .sienna-button-red:hover { background: #35363a; }
-.sienna-hero .sienna-button-light { background: transparent; color: #fff; border-color: #ffffff90; }
-.sienna-hero .sienna-button-light:hover { background: #ffffff18; }
-.sienna-hero-photo { position: relative; margin: 0; overflow: hidden; border-radius: 8px; background: #e8e9e9; animation: sienna-photo-arrive 1500ms ease-out both; }
-.sienna-hero-photo img { display: block; width: 100%; height: auto; aspect-ratio: 19 / 10; object-fit: cover; }
-.sienna-hero-photo figcaption { position: absolute; bottom: 1rem; left: 1rem; color: white; font-size: .75rem; letter-spacing: .08em; background: #17181ba8; padding: .35rem .6rem; border-radius: 4px; direction: ltr; }
+.sienna-hero-photo { margin: 0; min-width: 0; background: #fff; animation: sienna-photo-arrive 1500ms ease-out both; }
+.sienna-hero-photo picture { display: block; overflow: hidden; border-radius: 12px; background: #ecece8; }
+.sienna-hero-photo img { display: block; width: 100%; height: auto; }
+.sienna-hero-photo figcaption { color: var(--sienna-muted); font-size: .8125rem; padding-top: .85rem; line-height: 1.6; }
 .sienna-facts-panel { background: var(--sienna-ink); color: #fff; }
 .sienna-facts { display: grid; grid-template-columns: repeat(4, 1fr); }
 .sienna-facts > div { display: flex; flex-direction: column-reverse; gap: .75rem; padding: 2rem; border-inline-end: 1px solid #ffffff30; }
@@ -170,7 +170,7 @@
 @media (max-width: 600px) { .sienna-grade-grid { grid-template-columns: 1fr; gap: 1rem; } .sienna-grade { --card-space: 1.3rem; } .sienna-grade h3 { font-size: 2.25rem; } .sienna-photo-grid { grid-template-columns: 1fr; } .sienna-photo-wide img { aspect-ratio: 1196 / 590; } .sienna-photo-grid figcaption { flex-direction: column; } .sienna-mobility { padding: 1.35rem; } .sienna-mobility-links { gap: .55rem; } .sienna-mobility-links a { padding: .8rem; } .sienna-spec-table > div { gap: .7rem; padding: .85rem .65rem; font-size: .9375rem; } .sienna-contact .sienna-actions { width: 100%; } .sienna-space-options { gap: .6rem; } .sienna-space-options > div { padding: 1rem; } }
 @media print { .sienna-reveal-content { opacity: 1 !important; transform: none !important; } .sienna-chapters, .sienna-actions, .sienna-grade-links { display: none; } .sienna-grade { break-inside: avoid; } }
 .sienna-overview :is(a, button, summary):focus-visible { outline: 2px solid var(--sienna-red); outline-offset: 5px; }
-.sienna-overview :is(.sienna-hero-panel, .sienna-contact) :is(a, button):focus-visible { outline-color: #fff; }
-@media (max-width: 1000px) { .sienna-container { width: calc(100% - 3rem); } .sienna-hero { grid-template-columns: 1fr; gap: 2rem; padding-block: 2.5rem; } .sienna-hero-copy > p:not(.sienna-kicker) { max-width: 60ch; } .sienna-facts > div { padding: 1.5rem 1rem; } }
-@media (max-width: 600px) { .sienna-container { width: calc(100% - 2rem); } .sienna-model-nav { min-height: 64px; } .sienna-hero h1 { font-size: 5rem; } .sienna-hero h2 { margin-block: 1rem; } .sienna-hero-photo { border-radius: 9px; } .sienna-facts { grid-template-columns: 1fr 1fr; } .sienna-facts > div { padding: 1.4rem 1rem; } .sienna-facts > div:first-child { padding-inline-start: 1rem; } .sienna-facts > div:nth-child(2) { border-inline-end: 0; } .sienna-facts > div:nth-child(-n+2) { border-bottom: 1px solid var(--sienna-line); } .sienna-facts dd { font-size: 1.9rem; } .sienna-section { padding-block: 3.5rem; } .sienna-actions > a { flex: 1; } }
+.sienna-overview .sienna-contact :is(a, button):focus-visible { outline-color: #fff; }
+@media (max-width: 1000px) { .sienna-container { width: calc(100% - 3rem); } .sienna-hero { gap: 2rem; padding-block: 2.5rem; } .sienna-hero-copy { grid-template-columns: 1fr; gap: 1.5rem; } .sienna-facts > div { padding: 1.5rem 1rem; } }
+@media (max-width: 600px) { .sienna-container { width: calc(100% - 2rem); } .sienna-model-nav { min-height: 64px; } .sienna-hero h1 { font-size: 5rem; } .sienna-hero h2 { margin-block: 0 .85rem; } .sienna-hero-photo picture { border-radius: 9px; } .sienna-facts { grid-template-columns: 1fr 1fr; } .sienna-facts > div { padding: 1.4rem 1rem; } .sienna-facts > div:first-child { padding-inline-start: 1rem; } .sienna-facts > div:nth-child(2) { border-inline-end: 0; } .sienna-facts > div:nth-child(-n+2) { border-bottom: 1px solid var(--sienna-line); } .sienna-facts dd { font-size: 1.9rem; } .sienna-section { padding-block: 3.5rem; } .sienna-actions > a { flex: 1; } }
 @media (prefers-reduced-motion: reduce) { .sienna-overview *, .sienna-overview *::before { transition: none !important; animation: none !important; scroll-behavior: auto !important; } .sienna-reveal-content { opacity: 1 !important; transform: none !important; } }

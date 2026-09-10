@@ -37,13 +37,17 @@ export function SiennaOverview() {
     </nav>
     <section className="sienna-hero-panel" aria-labelledby="sienna-title"><div className="sienna-hero sienna-container">
       <div className="sienna-hero-copy">
+        <div className="sienna-hero-heading">
         <p className="sienna-kicker">TOYOTA / HYBRID / 2026</p>
         <h1 id="sienna-title" lang="en">SIENNA<span>.</span></h1>
+        </div>
+        <div className="sienna-hero-intro">
         <h2>{he ? "מקום לכל מה שחשוב." : "Room for what matters."}</h2>
         <p>{he ? "שבעה או שמונה מקומות, הנעה היברידית בכל גרסה, ואפשרויות נוחות שמתאימות לחיים שלכם. הכירו את הסיינה מקרוב." : "Seven or eight seats, hybrid power in every version, and comfort choices for the way you travel. Get to know the Sienna."}</p>
         <div className="sienna-actions"><a className="sienna-button sienna-button-red" href="#sienna-trims">{he ? "גלו את רמות הגימור" : "Explore the trims"}<Arrow size={18} /></a><Link className="sienna-button sienna-button-light" to="/toyota/sienna/studio">{he ? "צפייה בסטודיו" : "View in studio"}<ArrowUpRight size={18} /></Link></div>
+        </div>
       </div>
-      <figure className="sienna-hero-photo"><img src={photo("hero")} width="1520" height="800" fetchPriority="high" alt={he ? "טויוטה סיינה Limited בצבע Blueprint, בחיק הטבע" : "Toyota Sienna Limited in Blueprint beside a forest"} /><figcaption>SIENNA LIMITED / BLUEPRINT</figcaption></figure>
+      <figure className="sienna-hero-photo"><picture><source media="(max-width: 700px)" srcSet={photo("hero-heavy-metal-mobile")} width="800" height="812" /><img src={photo("hero-heavy-metal")} width="1800" height="629" fetchPriority="high" alt={he ? "טויוטה סיינה Limited בצבע כסוף בנסיעה בכביש לצד הרים ויערות" : "Silver Toyota Sienna Limited driving along a mountain road"} /></picture><figcaption>{he ? "סיינה Limited · צילום: Toyota Canada" : "Sienna Limited · Photography: Toyota Canada"}</figcaption></figure>
     </div></section>
     <div className="sienna-facts-panel"><dl className="sienna-facts sienna-container">
       {[
