@@ -1,4 +1,4 @@
-.sienna-overview { --sienna-red: #d90000; --sienna-ink: #191a1d; --sienna-muted: #65666d; --sienna-line: #e1e2e6; background: #fff; color: var(--sienna-ink); }
+.sienna-overview { --sienna-red: #da2128; --sienna-red-dark: #b31b21; --sienna-ink: #191a1d; --sienna-muted: #65666d; --sienna-line: #e1e2e6; background: #fff; color: var(--sienna-ink); }
 .sienna-container { width: min(1440px, calc(100% - 5rem)); margin-inline: auto; }
 .sienna-model-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 82px; font-size: .875rem; border-bottom: 1px solid var(--sienna-line); }
 .sienna-model-nav > div { display: flex; align-items: center; gap: 1rem; }
@@ -19,7 +19,7 @@
 .sienna-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
 .sienna-button { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; padding: .85rem 1.2rem; min-height: 48px; border-radius: 6px; font-size: .9375rem; font-weight: 600; transition: background 300ms ease, color 300ms ease; }
 .sienna-overview .sienna-button-red { background: var(--sienna-red); color: #fff; }
-.sienna-button-red:hover { background: #b40000; }
+.sienna-button-red:hover { background: var(--sienna-red-dark); }
 .sienna-button-light { background: #fff; border: 1px solid #ced0d5; }
 .sienna-button-light:hover { background: #f5f5f6; }
 .sienna-hero .sienna-button-red { background: #191a1d; color: #fff; }
@@ -103,7 +103,7 @@
 .sienna-finish-details p > span { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #0002; flex-shrink: 0; }
 .sienna-grade-links { display: grid; gap: .5rem; }
 .sienna-grade-links a { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; border-radius: 5px; background: var(--sienna-red); color: #fff; transition: background 300ms ease; }
-.sienna-grade-links a:hover { background: #b40000; }
+.sienna-grade-links a:hover { background: var(--sienna-red-dark); }
 .sienna-grade-links a > span { display: flex; flex-direction: column; gap: .2rem; align-items: start; font-weight: 600; font-size: .9375rem; }
 .sienna-grade-links small { font-size: .8125rem; font-weight: 400; color: #fff; }
 .sienna-grade-links svg { color: #fff; flex-shrink: 0; }
@@ -149,7 +149,7 @@
 .sienna-contact h2 { font-size: clamp(1.8rem, 3vw, 3rem); font-weight: 650; margin-bottom: 1rem; }
 .sienna-contact p:not(.sienna-kicker) { font-size: 1rem; color: #fff; line-height: 1.8; max-width: 57ch; }
 .sienna-contact .sienna-kicker { color: #fff; }
-.sienna-contact .sienna-button-red { background: #fff; color: #b40000; }
+.sienna-contact .sienna-button-red { background: #fff; color: var(--sienna-red); }
 .sienna-contact .sienna-button-red:hover { background: #f3f3f1; }
 .sienna-contact .sienna-button-light { background: transparent; border-color: #ffffff90; color: #fff; }
 .sienna-contact .sienna-button-light:hover { background: #ffffff18; }
