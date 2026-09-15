@@ -1,0 +1,9 @@
+{
+  "checked": "2026-09-15",
+  "credit": "Toyota Canada",
+  "sourcePage": "https://www.toyota.ca/en/vehicles/grand-highlander/overview/",
+  "photos": [
+    { "file": "grand-highlander.webp", "url": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-hero-grand-highlander-platinum-hybrid-max-storm-cloud-l?fit=constrain&wid=1800&qlt=85&fmt=webp" },
+    { "file": "grand-highlander-mobile.webp", "url": "https://toyotacanada.scene7.com/is/image/toyotacanada/toyota-2026-hero-grand-highlander-platinum-hybrid-max-storm-cloud-p?fit=constrain&wid=800&qlt=85&fmt=webp" }
+  ]
+}
